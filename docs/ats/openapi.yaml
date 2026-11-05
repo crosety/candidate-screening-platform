@@ -1,0 +1,1861 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+info:
+  title: Integración ATS · Plataforma de cribado
+  version: 1.0.0
+  summary: Contrato entre el ATS de un cliente y la plataforma de cribado con agentes de IA.
+  description: |
+    Especificación de la integración entre el ATS de un cliente (en el caso práctico,
+    Grupo Sazón) y la plataforma de cribado. Cubre tres direcciones:
+
+    1. **Ingesta** (`paths`): el ATS crea o recupera una candidatura y recibe el enlace
+       personal del candidato. Implementada tal como se describe.
+    2. **Escritura de vuelta** (`webhooks` `ats.write_result` y `ats.set_stage`): lo que
+       la plataforma escribe hoy en el ATS a través del conector. Las cargas y el acuse
+       están implementados; el transporte HTTP firmado que aquí se describe es una
+       propuesta, porque hoy solo existe el conector nativo del ATS simulado.
+    3. **Eventos** (resto de `webhooks`): notificaciones de cribado completado, entrevista,
+       derivación a una persona, baja y supresión. Propuestas, con cargas derivadas de los
+       datos que la plataforma ya produce.
+
+    Cada operación, respuesta, cabecera o propiedad lleva `x-status`:
+    `implemented` (lo hace el código actual y lo comprueba
+    `tests/contracts/test_ats_spec.py`) o `proposed` (diseño para una integración real,
+    todavía sin código). Un elemento sin `x-status` hereda el de su contenedor.
+
+    La instalación incluye un ATS local que implementa este contrato para desarrollo y
+    pruebas; no hay una integración certificada con un proveedor comercial. Todos los
+    nombres, teléfonos e identificadores de los ejemplos son ficticios.
+  contact:
+    name: Forward Deployed Engineering
+  license:
+    name: Uso interno del caso práctico
+    identifier: LicenseRef-Proprietary
+  x-status: implemented
+servers:
+  - url: https://{host}/api/v1
+    description: Instancia de la plataforma. La ingesta no se publica en el túnel externo.
+    variables:
+      host:
+        default: cribado.example.com
+tags:
+  - name: ingesta
+    description: Entrada de candidaturas desde el ATS autorizado.
+  - name: privacidad
+    description: Peticiones de supresión iniciadas por el ATS.
+  - name: escritura
+    description: Escrituras de la plataforma en el ATS (resultado y etapa).
+  - name: eventos
+    description: Notificaciones de la plataforma al ATS.
+paths:
+  /ingest/{tenant_slug}/applications:
+    post:
+      operationId: ingestApplication
+      tags: [ingesta]
+      summary: Crear o recuperar una candidatura
+      description: |
+        Alta idempotente por `(tenant_slug, external_id)`. Si la candidatura ya existe, se
+        actualizan nombre, teléfono, ciudad, zona horaria y segmento, y se devuelve la misma
+        `application_id` y el mismo enlace: repetir la ingesta con una firma nueva es la forma
+        segura de recuperar un acuse perdido. Cambiar `job_ref` de una candidatura existente
+        devuelve 409.
+
+        Orden de evaluación real: Django Ninja valida el cuerpo antes de ejecutar la vista,
+        así que un cuerpo inválido devuelve 400 aunque falte la firma; después se comprueba
+        la firma (401), la repetición del nonce (409/503) y por último el alta (404/409).
+
+        Efectos: si el cliente tiene WhatsApp con plantilla de primer contacto y el envío está
+        habilitado en el servidor, se encola un primer contacto idempotente. `job_ref` no se
+        valida contra las ofertas publicadas en este paso: una oferta inexistente o cerrada
+        falla al abrir la conversación (propuesta: 422 en la ingesta).
+
+        `candidate_link` es un secreto personal del candidato: no debe registrarse en logs ni
+        compartirse fuera del canal acordado con el candidato.
+      x-status: implemented
+      x-source: src/web/conversations/api.py::ingest
+      security:
+        - ingestSignature: []
+      parameters:
+        - $ref: '#/components/parameters/TenantSlug'
+        - $ref: '#/components/parameters/IngestTimestamp'
+        - $ref: '#/components/parameters/IngestNonce'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestApplication'
+            examples:
+              nueva:
+                summary: Alta de una candidata desde el ATS
+                value:
+                  external_id: SAZ-000123
+                  candidate_name: Lucía Martín Ferrer
+                  phone: '+34600000000'
+                  city: València
+                  job_ref: repartidores
+                  timezone: Europe/Madrid
+                  segment: València
+              minima:
+                summary: Solo los campos obligatorios (zona horaria Europe/Madrid por defecto)
+                value:
+                  external_id: SAZ-000124
+                  candidate_name: Andrés Gil Soto
+                  phone: ''
+                  city: Ciudad de México
+                  job_ref: repartidores
+      responses:
+        '200':
+          description: |
+            Candidatura creada o recuperada. Repetir la misma `external_id` devuelve el mismo
+            `application_id` y el mismo `candidate_link`.
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestResult'
+              examples:
+                creada:
+                  value:
+                    application_id: 0b9d7c4e-5f1a-4c2b-9e3d-7a6f5e4d3c2b
+                    candidate_link: https://candidatos.example.com/c/3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c1e3b5d7f9a1c3e5b7d9f1a3c5e7b9d1f3a
+        '400':
+          description: |
+            Cuerpo no válido según el esquema (campo ausente, longitud, zona horaria IANA
+            inexistente o JSON mal formado). Hoy `detail` lleva el primer error de validación.
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                zona_horaria_invalida:
+                  summary: Zona horaria que no existe en la base IANA
+                  value:
+                    detail: 'Entrada no válida: Value error, Zona horaria no válida'
+                  x-trigger: invalid_body
+                  x-signed: true
+                  x-request-body:
+                    external_id: SAZ-000125
+                    candidate_name: Marta Ruiz Pons
+                    phone: '+34600000001'
+                    city: València
+                    job_ref: repartidores
+                    timezone: Europe/Valencia
+                campo_ausente_sin_firma:
+                  summary: Falta un campo obligatorio; se rechaza antes de mirar la firma
+                  value:
+                    detail: 'Entrada no válida: Field required'
+                  x-trigger: invalid_body
+                  x-signed: false
+                  x-request-body:
+                    external_id: SAZ-000126
+                    phone: '+34600000002'
+                    city: València
+                    job_ref: repartidores
+        '401':
+          description: |
+            Firma ausente, mal formada, de otro cliente o fuera de la ventana temporal
+            (más de 300 s en el pasado o más de 30 s en el futuro), o servidor sin raíz de
+            ingesta configurada. No se distingue la causa para no orientar a un atacante.
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                firma_no_valida:
+                  value:
+                    detail: Firma de ingesta no válida o caducada
+                  x-trigger: bad_signature
+        '404':
+          description: |
+            Cliente inexistente (solo alcanzable con una clave derivada para ese
+            identificador) o candidatura suprimida por privacidad. Para la supresión se
+            propone 410.
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                cliente_desconocido:
+                  value:
+                    detail: Cliente no encontrado
+                  x-trigger: unknown_tenant
+                candidatura_suprimida:
+                  value:
+                    detail: Candidatura retirada
+                  x-trigger: erased
+        '409':
+          description: |
+            Conflicto. Tres causas reales: nonce ya usado dentro de la ventana de 360 s
+            (repetir con nonce y firma nuevos, nunca reenviar la misma petición), cambio de
+            oferta de una candidatura existente, o enlace del candidato revocado o caducado,
+            que exige una renovación explícita por parte de selección.
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                nonce_repetido:
+                  value:
+                    detail: Petición ya recibida; usa una nueva firma para consultar el resultado
+                  x-trigger: replay
+                cambio_de_oferta:
+                  value:
+                    detail: Una candidatura existente no puede cambiar de oferta.
+                  x-trigger: job_ref_changed
+                enlace_por_renovar:
+                  value:
+                    detail: El enlace anterior necesita renovación explícita por selección.
+                  x-trigger: link_needs_renewal
+        '410':
+          description: |
+            Propuesto para sustituir al 404 actual cuando la candidatura fue suprimida por
+            privacidad: el ATS debe dejar de reenviarla y no crear otra con el mismo
+            `external_id`.
+          x-status: proposed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                suprimida:
+                  value:
+                    type: https://cribado.example.com/problemas/candidatura-suprimida
+                    title: Candidatura suprimida
+                    status: 410
+                    detail: Los datos de esta candidatura se retiraron a petición de la persona.
+                    code: application_erased
+        '413':
+          description: Propuesto. Cuerpo mayor de 16 KiB. Hoy solo aplica el límite general de Django (2,5 MiB).
+          x-status: proposed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                demasiado_grande:
+                  value:
+                    type: https://cribado.example.com/problemas/cuerpo-demasiado-grande
+                    title: Cuerpo demasiado grande
+                    status: 413
+                    detail: El cuerpo supera 16 KiB.
+                    code: payload_too_large
+        '422':
+          description: |
+            Propuesto. Cuerpo válido pero no procesable: `job_ref` que no es una oferta
+            publicada y abierta del cliente, o `phone` que no está en formato E.164. Hoy la
+            ingesta acepta la candidatura y el error aparece al abrir la conversación.
+          x-status: proposed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                oferta_no_publicada:
+                  value:
+                    type: https://cribado.example.com/problemas/oferta-no-disponible
+                    title: Oferta no disponible
+                    status: 422
+                    detail: La oferta «cocina» no está publicada para este cliente.
+                    code: offer_not_open
+        '429':
+          description: |
+            Propuesto. Límite por cliente (ver `x-limits`). Hoy la ingesta no tiene límite
+            propio: el volumen lo controla el ATS autorizado.
+          x-status: proposed
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+            RateLimit-Limit:
+              $ref: '#/components/headers/RateLimitLimit'
+            RateLimit-Remaining:
+              $ref: '#/components/headers/RateLimitRemaining'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                limite:
+                  value:
+                    type: https://cribado.example.com/problemas/demasiadas-peticiones
+                    title: Demasiadas peticiones
+                    status: 429
+                    detail: Se ha superado el límite de 120 ingestas por minuto.
+                    code: rate_limited
+        '503':
+          description: |
+            No se puede comprobar la repetición porque la caché (Redis) no responde. La
+            petición no se ha procesado: repetir con nonce y firma nuevos. `Retry-After` es
+            una propuesta.
+          x-status: implemented
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                cache_no_disponible:
+                  value:
+                    detail: No se puede verificar la repetición de la ingesta
+                  x-trigger: cache_unavailable
+  /ingest/{tenant_slug}/applications/{external_id}/erasure-requests:
+    post:
+      operationId: requestApplicationErasure
+      tags: [privacidad]
+      summary: Pedir la supresión de una candidatura desde el ATS
+      description: |
+        Propuesto. Hoy la supresión es un comando auditado del operador
+        (`manage.py redact_candidate --apply`) que exige pausar el worker del cliente. Esta
+        operación la encolaría con la misma firma de ingesta y respondería 202; al terminar,
+        la plataforma emitiría `candidate.erased`. La referencia del expediente es opaca y no
+        debe contener datos personales.
+      x-status: proposed
+      security:
+        - ingestSignature: []
+      parameters:
+        - $ref: '#/components/parameters/TenantSlug'
+        - name: external_id
+          in: path
+          required: true
+          description: Identificador de la candidatura en el ATS, codificado para URL.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 60
+        - $ref: '#/components/parameters/IngestTimestamp'
+        - $ref: '#/components/parameters/IngestNonce'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErasureRequest'
+            examples:
+              solicitud:
+                value:
+                  case_ref: RGPD-2026-0042
+                  requested_at: '2026-10-28T09:15:00Z'
+      responses:
+        '202':
+          description: Supresión aceptada y encolada. El resultado llega como `candidate.erased`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErasureAccepted'
+              examples:
+                aceptada:
+                  value:
+                    status: accepted
+                    case_ref: RGPD-2026-0042
+        '401':
+          description: Firma no válida (mismas reglas que la ingesta).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '410':
+          description: La candidatura ya estaba suprimida; la petición es idempotente y no repite efectos.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          description: Límite por cliente.
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: Caché o base de datos no disponible; repetir con nonce y firma nuevos.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+webhooks:
+  ats.write_result:
+    post:
+      operationId: atsWriteResult
+      tags: [escritura]
+      summary: Escribir el resultado del cribado en el ATS
+      description: |
+        Carga implementada: la crea `enqueue_write_result` cuando una decisión queda
+        aplicada (aprobación automática de un apto con nivel 2 o superior y sin señales, o
+        confirmación/corrección humana) y el worker la entrega con la operación
+        `write_result` del conector ATS con permiso de escritura. `fields` contiene solo los campos con valor no nulo, con la
+        clave `ats_field` del esquema de resultado del perfil. `stage` es el ajuste
+        `stage_{verdict}` de la conexión; vacío si no está configurado.
+
+        Transporte actual: conector nativo `sim_ats` (en proceso). El adaptador MCP no
+        implementa esta operación. El transporte HTTP firmado (cabeceras de este webhook) es
+        una propuesta. Hoy la clave idempotente se guarda en la plataforma pero no viaja al
+        ATS: un ATS real debe recibirla en `Idempotency-Key` para deduplicar.
+
+        Riesgo conocido de orden: si una escritura de resultado se reintenta después de que
+        ya se aplicara `ats.set_stage`, el ATS volvería a la etapa de apto. Ver `x-delivery`.
+      x-status: implemented
+      x-transport:
+        implemented: conector nativo sim_ats, operación write_result
+        proposed: POST HTTPS firmado al endpoint registrado por el cliente
+      x-outbox-kind: ats.write_result
+      x-idempotency-key-template: write_result:{decision_id}
+      x-source: src/screening/application/assessment.py::enqueue_write_result
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtsWriteResultCommand'
+            examples:
+              apta:
+                summary: Resultado de Lucía, apta con aplicación automática
+                value:
+                  application_external_id: SAZ-000123
+                  verdict: qualified
+                  fields:
+                    candidate.name: Lucía Martín Ferrer
+                    custom.licencia: true
+                    custom.tipo_licencia: B
+                    custom.ciudad: València
+                    custom.zona: Russafa
+                    custom.local: Sazón Ruzafa
+                    custom.disponibilidad: media jornada
+                    custom.turno: tarde
+                    custom.experiencia_anios: 2
+                    custom.experiencia_plataforma: Glovo
+                    custom.fecha_inicio: '2026-11-02'
+                  summary: Carnet B vigente, vive en Russafa (València) y acepta Sazón Ruzafa. Media jornada de tarde, dos años en Glovo; puede empezar el 02/11/2026.
+                  stage: Cribado superado
+      responses:
+        '200':
+          description: |
+            Acuse implementado: el conector debe devolver exactamente `{"status": "ok"}`.
+            Cualquier otra respuesta o excepción deja el efecto pendiente y se reintenta.
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectorAck'
+              examples:
+                ok:
+                  value:
+                    status: ok
+        '409':
+          description: |
+            Propuesto. La clave idempotente ya se aplicó con la misma carga: la plataforma lo
+            trata como entregado. Con una carga distinta, el ATS debe responder 422.
+          x-status: proposed
+        '422':
+          description: Propuesto. Carga rechazada de forma definitiva (por ejemplo, campo inexistente en el ATS); no se reintenta y pasa a revisión manual.
+          x-status: proposed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        default:
+          description: Error transitorio o desconocido; se reintenta según `x-delivery`.
+          x-status: implemented
+  ats.set_stage:
+    post:
+      operationId: atsSetStage
+      tags: [escritura]
+      summary: Mover la candidatura a la etapa de entrevista
+      description: |
+        Carga implementada: la crea la política de reserva cuando el candidato reserva una
+        entrevista, con la etapa `stage_interview` de la conexión y una nota legible. Mismo
+        transporte, acuse y reintentos que `ats.write_result`.
+      x-status: implemented
+      x-transport:
+        implemented: conector nativo sim_ats, operación set_stage
+        proposed: POST HTTPS firmado al endpoint registrado por el cliente
+      x-outbox-kind: ats.set_stage
+      x-idempotency-key-template: set_stage:{session_id}:interview
+      x-source: src/screening/application/assessment.py::DecisionBookingPolicy.booked
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtsSetStageCommand'
+            examples:
+              entrevista:
+                value:
+                  application_external_id: SAZ-000123
+                  stage: Entrevista
+                  note: 'Entrevista: jueves 29/10/2026 16:00 en Sazón Ruzafa'
+      responses:
+        '200':
+          description: 'Acuse implementado: `{"status": "ok"}`.'
+          x-status: implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectorAck'
+        default:
+          description: Error transitorio o desconocido; se reintenta según `x-delivery`.
+          x-status: implemented
+  screening.completed:
+    post:
+      operationId: screeningCompleted
+      tags: [eventos]
+      summary: Cribado completado
+      description: |
+        Propuesto. Se emitiría al guardar el resultado de la evaluación, haya o no decisión
+        aplicada. Con `decision.status = proposed` el ATS no debe mover la etapa: la escritura
+        definitiva llega después como `ats.write_result`, tras la revisión humana. La carga
+        reutiliza el resultado real (veredicto, campos con valor/evidencia/confianza,
+        resumen, motivo, señales y observación de sentimiento por etapa).
+      x-status: proposed
+      x-idempotency-key-template: screening.completed:{session_id}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScreeningCompletedEvent'
+            examples:
+              apta:
+                value:
+                  event_id: 5c0e2f4a-8b1d-4e6f-9a3c-2d7b5e1f0a9c
+                  event_type: screening.completed
+                  schema_version: '1'
+                  occurred_at: '2026-10-28T16:42:10Z'
+                  tenant: grupo_sazon
+                  idempotency_key: screening.completed:6a2f9d1c-3e4b-4a5d-8c7e-1f0b9a8d7c6e
+                  sequence: 1
+                  is_test: false
+                  application:
+                    external_id: SAZ-000123
+                    application_id: 0b9d7c4e-5f1a-4c2b-9e3d-7a6f5e4d3c2b
+                  data:
+                    session:
+                      id: 6a2f9d1c-3e4b-4a5d-8c7e-1f0b9a8d7c6e
+                      channel: whatsapp
+                      language: es
+                      status: active
+                    result:
+                      verdict: qualified
+                      reason: Cumple los requisitos excluyentes y acepta un local con vacantes.
+                      summary: Carnet B vigente, vive en Russafa (València) y acepta Sazón Ruzafa. Media jornada de tarde, dos años en Glovo; puede empezar el 02/11/2026.
+                      flags: []
+                      evaluator_model: gpt-6.1-terra
+                      fields:
+                        nombre_completo:
+                          value: Lucía Martín Ferrer
+                          evidence: Me llamo Lucía Martín Ferrer
+                          confidence: high
+                        carnet:
+                          value: true
+                          evidence: Sí, tengo el carnet B en vigor
+                          confidence: high
+                        tipo_carnet:
+                          value: B
+                          evidence: Sí, tengo el carnet B en vigor
+                          confidence: high
+                        ciudad:
+                          value: València
+                          evidence: Vivo en València, en Russafa
+                          confidence: high
+                        zona:
+                          value: Russafa
+                          evidence: Vivo en València, en Russafa
+                          confidence: high
+                        local_asignado:
+                          value: Sazón Ruzafa
+                          evidence: Me viene bien Sazón Ruzafa
+                          confidence: high
+                        disponibilidad:
+                          value: media jornada
+                          evidence: Busco media jornada
+                          confidence: high
+                        turno:
+                          value: tarde
+                          evidence: Prefiero las tardes
+                          confidence: high
+                        experiencia_anios:
+                          value: 2
+                          evidence: Llevo dos años repartiendo con Glovo
+                          confidence: medium
+                        experiencia_plataforma:
+                          value: Glovo
+                          evidence: Llevo dos años repartiendo con Glovo
+                          confidence: high
+                        incorporacion:
+                          value: '2026-11-02'
+                          evidence: Puedo empezar el lunes 2 de noviembre
+                          confidence: high
+                      sentiment:
+                        - stage: opening
+                          label: positive
+                          evidence: Hola, sí, me interesa mucho
+                        - stage: requirements
+                          label: neutral
+                          evidence: null
+                        - stage: matching
+                          label: positive
+                          evidence: Me viene bien Sazón Ruzafa
+                        - stage: closing
+                          label: unclear
+                          evidence: null
+                    decision:
+                      id: 9e8d7c6b-5a4f-4e3d-8c2b-1a0f9e8d7c6b
+                      decision_type: qualify
+                      status: applied
+                      autonomy_level: 2
+                      decided_by: agent
+                    ats_fields:
+                      candidate.name: Lucía Martín Ferrer
+                      custom.licencia: true
+                      custom.tipo_licencia: B
+                      custom.ciudad: València
+                      custom.zona: Russafa
+                      custom.local: Sazón Ruzafa
+                      custom.disponibilidad: media jornada
+                      custom.turno: tarde
+                      custom.experiencia_anios: 2
+                      custom.experiencia_plataforma: Glovo
+                      custom.fecha_inicio: '2026-11-02'
+                    next_step: offer_interview
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+  interview.booked:
+    post:
+      operationId: interviewBooked
+      tags: [eventos]
+      summary: Entrevista reservada
+      description: |
+        Propuesto como evento. Hoy la reserva se refleja en el ATS con `ats.set_stage`
+        (implementado). El evento añadiría la hora absoluta, el local y la secuencia de la
+        cita para que el ATS pueda conciliar cambios posteriores.
+      x-status: proposed
+      x-idempotency-key-template: interview.booked:{booking_id}:{booking_sequence}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewBookedEvent'
+            examples:
+              reservada:
+                value:
+                  event_id: 1d2c3b4a-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+                  event_type: interview.booked
+                  schema_version: '1'
+                  occurred_at: '2026-10-28T16:44:02Z'
+                  tenant: grupo_sazon
+                  idempotency_key: interview.booked:4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e:0
+                  sequence: 2
+                  is_test: false
+                  application:
+                    external_id: SAZ-000123
+                    application_id: 0b9d7c4e-5f1a-4c2b-9e3d-7a6f5e4d3c2b
+                  data:
+                    session_id: 6a2f9d1c-3e4b-4a5d-8c7e-1f0b9a8d7c6e
+                    stage: Entrevista
+                    interview:
+                      booking_id: 4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e
+                      booking_sequence: 0
+                      slot_id: 8f7e6d5c-4b3a-4f2e-9d1c-0b9a8f7e6d5c
+                      starts_at: '2026-10-29T15:00:00Z'
+                      starts_at_local: jueves 29/10/2026 16:00
+                      duration_minutes: 15
+                      site_name: Sazón Ruzafa
+                      site_external_id: VLC-RUZ
+                      site_timezone: Europe/Madrid
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+  interview.rescheduled:
+    post:
+      operationId: interviewRescheduled
+      tags: [eventos]
+      summary: Entrevista cambiada de hora
+      description: |
+        Propuesto. Lleva la cita anterior y la nueva con `booking_sequence` incrementada; el
+        ATS descarta cualquier evento de la misma cita con una secuencia menor o igual a la
+        última aplicada.
+      x-status: proposed
+      x-idempotency-key-template: interview.rescheduled:{booking_id}:{booking_sequence}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewRescheduledEvent'
+            examples:
+              cambiada:
+                value:
+                  event_id: 2e3d4c5b-6a7f-4b8c-9d0e-1f2a3b4c5d6e
+                  event_type: interview.rescheduled
+                  schema_version: '1'
+                  occurred_at: '2026-10-29T08:05:31Z'
+                  tenant: grupo_sazon
+                  idempotency_key: interview.rescheduled:4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e:1
+                  sequence: 3
+                  is_test: false
+                  application:
+                    external_id: SAZ-000123
+                    application_id: 0b9d7c4e-5f1a-4c2b-9e3d-7a6f5e4d3c2b
+                  data:
+                    session_id: 6a2f9d1c-3e4b-4a5d-8c7e-1f0b9a8d7c6e
+                    rescheduled_by: candidate
+                    previous:
+                      booking_id: 4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e
+                      booking_sequence: 0
+                      slot_id: 8f7e6d5c-4b3a-4f2e-9d1c-0b9a8f7e6d5c
+                      starts_at: '2026-10-29T15:00:00Z'
+                      starts_at_local: jueves 29/10/2026 16:00
+                      duration_minutes: 15
+                      site_name: Sazón Ruzafa
+                      site_external_id: VLC-RUZ
+                      site_timezone: Europe/Madrid
+                    interview:
+                      booking_id: 4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e
+                      booking_sequence: 1
+                      slot_id: 7e6d5c4b-3a2f-4e1d-8c0b-9a8f7e6d5c4b
+                      starts_at: '2026-10-30T09:00:00Z'
+                      starts_at_local: viernes 30/10/2026 10:00
+                      duration_minutes: 15
+                      site_name: Sazón Ruzafa
+                      site_external_id: VLC-RUZ
+                      site_timezone: Europe/Madrid
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+  interview.cancelled:
+    post:
+      operationId: interviewCancelled
+      tags: [eventos]
+      summary: Entrevista cancelada
+      description: |
+        Propuesto. El ATS debe sacar la candidatura de la etapa de entrevista según su propio
+        flujo; la plataforma no decide un descarte por una cancelación.
+      x-status: proposed
+      x-idempotency-key-template: interview.cancelled:{booking_id}:{booking_sequence}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewCancelledEvent'
+            examples:
+              cancelada:
+                value:
+                  event_id: 3f4e5d6c-7b8a-4c9d-8e0f-1a2b3c4d5e6f
+                  event_type: interview.cancelled
+                  schema_version: '1'
+                  occurred_at: '2026-10-29T18:20:00Z'
+                  tenant: grupo_sazon
+                  idempotency_key: interview.cancelled:4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e:2
+                  sequence: 4
+                  is_test: false
+                  application:
+                    external_id: SAZ-000123
+                    application_id: 0b9d7c4e-5f1a-4c2b-9e3d-7a6f5e4d3c2b
+                  data:
+                    session_id: 6a2f9d1c-3e4b-4a5d-8c7e-1f0b9a8d7c6e
+                    cancelled_by: recruiter
+                    interview:
+                      booking_id: 4b3a2f1e-0d9c-4b8a-9f7e-6d5c4b3a2f1e
+                      booking_sequence: 2
+                      slot_id: 7e6d5c4b-3a2f-4e1d-8c0b-9a8f7e6d5c4b
+                      starts_at: '2026-10-30T09:00:00Z'
+                      starts_at_local: viernes 30/10/2026 10:00
+                      duration_minutes: 15
+                      site_name: Sazón Ruzafa
+                      site_external_id: VLC-RUZ
+                      site_timezone: Europe/Madrid
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+  handoff.requested:
+    post:
+      operationId: handoffRequested
+      tags: [eventos]
+      summary: Conversación derivada a una persona
+      description: |
+        Propuesto. Hoy la derivación cambia la sesión a `handed_off` y registra un evento
+        interno (`handoff_requested` o `auto_handoff`), visible en la consola, sin escribir en
+        el ATS. El evento lleva un código de motivo, no el texto libre del agente, que puede
+        contener datos personales.
+      x-status: proposed
+      x-idempotency-key-template: handoff.requested:{session_event_id}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandoffRequestedEvent'
+            examples:
+              por_peticion:
+                value:
+                  event_id: 4a5b6c7d-8e9f-4a0b-9c1d-2e3f4a5b6c7d
+                  event_type: handoff.requested
+                  schema_version: '1'
+                  occurred_at: '2026-10-28T11:02:45Z'
+                  tenant: grupo_sazon
+                  idempotency_key: handoff.requested:c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f
+                  sequence: 1
+                  is_test: false
+                  application:
+                    external_id: SAZ-000127
+                    application_id: 1c0b9a8f-7e6d-4c5b-8a3f-2e1d0c9b8a7f
+                  data:
+                    session:
+                      id: 2b1a0f9e-8d7c-4b6a-9f5e-4d3c2b1a0f9e
+                      channel: web
+                      language: es
+                      status: handed_off
+                    reason_code: agent_request
+                    urgency: high
+                    flags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+  candidate.withdrawn:
+    post:
+      operationId: candidateWithdrawn
+      tags: [eventos]
+      summary: El candidato se da de baja del cribado
+      description: |
+        Propuesto. Hoy una baja en el canal (por ejemplo, en WhatsApp) marca la sesión
+        como `abandoned`, cancela recordatorios y registra `channel_opt_out`, sin avisar al
+        ATS. La baja del canal no equivale a una supresión de datos.
+      x-status: proposed
+      x-idempotency-key-template: candidate.withdrawn:{session_id}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateWithdrawnEvent'
+            examples:
+              baja_whatsapp:
+                value:
+                  event_id: 5b6c7d8e-9f0a-4b1c-8d2e-3f4a5b6c7d8e
+                  event_type: candidate.withdrawn
+                  schema_version: '1'
+                  occurred_at: '2026-10-28T19:30:12Z'
+                  tenant: grupo_sazon
+                  idempotency_key: candidate.withdrawn:3c2b1a0f-9e8d-4c7b-8a6f-5e4d3c2b1a0f
+                  sequence: 2
+                  is_test: false
+                  application:
+                    external_id: SAZ-000128
+                    application_id: 2d1c0b9a-8f7e-4d6c-9b5a-4f3e2d1c0b9a
+                  data:
+                    session:
+                      id: 3c2b1a0f-9e8d-4c7b-8a6f-5e4d3c2b1a0f
+                      channel: whatsapp
+                      language: es
+                      status: abandoned
+                    reason_code: channel_opt_out
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+  candidate.erased:
+    post:
+      operationId: candidateErased
+      tags: [eventos]
+      summary: Datos de la candidatura suprimidos
+      description: |
+        Propuesto. Hoy `redact_candidate --apply` retira en la plataforma mensajes, resultado,
+        decisiones, efectos pendientes, enlaces y canales, y con el ATS local también su
+        ficha (misma base de datos). Con un ATS real, este evento pide al ATS que
+        aplique su propia supresión; no lleva datos personales, solo el identificador externo
+        y la referencia opaca del expediente. Proveedores y copias de seguridad requieren
+        gestión separada.
+      x-status: proposed
+      x-idempotency-key-template: candidate.erased:{application_id}
+      parameters:
+        - $ref: '#/components/parameters/WebhookEventId'
+        - $ref: '#/components/parameters/WebhookTimestamp'
+        - $ref: '#/components/parameters/WebhookSignature'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateErasedEvent'
+            examples:
+              suprimida:
+                value:
+                  event_id: 6c7d8e9f-0a1b-4c2d-9e3f-4a5b6c7d8e9f
+                  event_type: candidate.erased
+                  schema_version: '1'
+                  occurred_at: '2026-10-28T10:01:07Z'
+                  tenant: grupo_sazon
+                  idempotency_key: candidate.erased:2d1c0b9a-8f7e-4d6c-9b5a-4f3e2d1c0b9a
+                  sequence: 3
+                  is_test: false
+                  application:
+                    external_id: SAZ-000128
+                    application_id: 2d1c0b9a-8f7e-4d6c-9b5a-4f3e2d1c0b9a
+                  data:
+                    case_ref: RGPD-2026-0042
+                    origin: ats
+                    erased_at: '2026-10-28T10:01:05Z'
+                    requested_action: erase_application_data
+      responses:
+        '200':
+          $ref: '#/components/responses/WebhookAccepted'
+        '409':
+          $ref: '#/components/responses/WebhookDuplicate'
+        default:
+          $ref: '#/components/responses/WebhookRetry'
+components:
+  securitySchemes:
+    ingestSignature:
+      type: apiKey
+      in: header
+      name: X-Ingest-Signature
+      description: |
+        HMAC-SHA256 en hexadecimal (64 caracteres en minúscula) con la clave del cliente.
+        La clave del cliente es el hex de HMAC-SHA256(raíz del servidor, `ingest-v1:{tenant_slug}`);
+        se entrega al ATS con `manage.py export_ingest_key` en un fichero 0600 y nunca se
+        entrega la raíz. El mensaje firmado son cinco líneas separadas por `\n`:
+        `X-Ingest-Timestamp`, `X-Ingest-Nonce`, `POST`, la ruta exacta sin query
+        (`/api/v1/ingest/{tenant_slug}/applications`) y el SHA-256 hex de los bytes del cuerpo.
+        La comparación es de tiempo constante. Rotar la raíz invalida todas las claves.
+      x-status: implemented
+      x-source: src/web/conversations/ingest_auth.py::authenticate_ingest
+      x-pattern: ^[0-9a-f]{64}$
+      x-signature-test-vector:
+        description: Vector de prueba con una raíz pública ficticia. No es una credencial.
+        root: raiz-de-ejemplo-no-usar-en-produccion
+        tenant_slug: grupo_sazon
+        tenant_key: 25b83e7efa0fc0852721461b11aeb358212c1070dd347eb6d604324c7d89260c
+        timestamp: '1793201400'
+        nonce: 7f3c2a9e4b1d4c08a6e5f0b2c9d8e7a1
+        path: /api/v1/ingest/grupo_sazon/applications
+        body: '{"external_id":"SAZ-000123","candidate_name":"Lucía Martín Ferrer","phone":"+34600000000","city":"València","job_ref":"repartidores","timezone":"Europe/Madrid","segment":"València"}'
+        body_sha256: a46472bda5d16e19ebb7de4a58c85c1a91e55ba1fa160cd9a0dbc2e915569a3f
+        signature: 7a90397c9d51ea707b7dd8a2d618b212b0c914be5fb8c7ba8fcd3d2d5acd6376
+  parameters:
+    TenantSlug:
+      name: tenant_slug
+      in: path
+      required: true
+      description: Identificador del cliente en la plataforma. Forma parte del mensaje firmado.
+      schema:
+        type: string
+        pattern: ^[a-z0-9_]+$
+        maxLength: 40
+      example: grupo_sazon
+    IngestTimestamp:
+      name: X-Ingest-Timestamp
+      in: header
+      required: true
+      description: Segundos Unix (10 cifras). Ventana aceptada de 300 s hacia atrás y 30 s hacia delante.
+      x-status: implemented
+      schema:
+        type: string
+        pattern: ^[0-9]{10}$
+      example: '1793201400'
+    IngestNonce:
+      name: X-Ingest-Nonce
+      in: header
+      required: true
+      description: Valor nuevo en cada petición. Se recuerda 360 s por cliente; repetirlo devuelve 409.
+      x-status: implemented
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9_-]{16,80}$
+      example: 7f3c2a9e4b1d4c08a6e5f0b2c9d8e7a1
+    WebhookEventId:
+      name: X-Screening-Event-Id
+      in: header
+      required: true
+      description: Identificador único de la entrega lógica; se repite igual en cada reintento.
+      x-status: proposed
+      schema:
+        type: string
+        format: uuid
+      example: 5c0e2f4a-8b1d-4e6f-9a3c-2d7b5e1f0a9c
+    WebhookTimestamp:
+      name: X-Screening-Timestamp
+      in: header
+      required: true
+      description: Segundos Unix del intento. El ATS debe rechazar desfases de más de 300 s.
+      x-status: proposed
+      schema:
+        type: string
+        pattern: ^[0-9]{10}$
+      example: '1793205730'
+    WebhookSignature:
+      name: X-Screening-Signature
+      in: header
+      required: true
+      description: |
+        `v1=` seguido del HMAC-SHA256 hex con la clave de webhooks del cliente (distinta de la
+        de ingesta) sobre cinco líneas: timestamp, event id, `POST`, ruta del endpoint del ATS
+        y SHA-256 hex del cuerpo. Mismo esquema que la ingesta para reutilizar la verificación.
+        Durante una rotación se envían dos firmas separadas por coma.
+      x-status: proposed
+      schema:
+        type: string
+        pattern: ^v1=[0-9a-f]{64}(,v1=[0-9a-f]{64})?$
+      example: v1=3b1f0c9d8e7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: |
+        Clave idempotente de la entrega. Para las escrituras coincide con la del outbox
+        (`write_result:{decision_id}`, `set_stage:{session_id}:interview`); hoy se guarda en
+        la plataforma pero no se transmite al conector.
+      x-status: proposed
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+      example: write_result:9e8d7c6b-5a4f-4e3d-8c2b-1a0f9e8d7c6b
+  headers:
+    RetryAfter:
+      description: Segundos que el cliente debe esperar antes de repetir.
+      x-status: proposed
+      schema:
+        type: integer
+        minimum: 1
+      example: 30
+    RateLimitLimit:
+      description: Peticiones permitidas en la ventana actual.
+      x-status: proposed
+      schema:
+        type: integer
+        minimum: 1
+      example: 120
+    RateLimitRemaining:
+      description: Peticiones restantes en la ventana actual.
+      x-status: proposed
+      schema:
+        type: integer
+        minimum: 0
+      example: 0
+  responses:
+    WebhookAccepted:
+      description: Recibido y aplicado (o encolado de forma duradera) por el ATS. Cualquier 2xx cuenta como entrega.
+      x-status: proposed
+    WebhookDuplicate:
+      description: Clave idempotente ya aplicada; la plataforma lo trata como entregado.
+      x-status: proposed
+    WebhookRetry:
+      description: Cualquier otro estado, tiempo agotado o error de red; se reintenta según `x-delivery`.
+      x-status: proposed
+  schemas:
+    Problem:
+      type: object
+      description: |
+        Error compartido. Hoy la API devuelve `application/json` con solo `detail` (texto en
+        español). La propuesta lo amplía a RFC 9457 (`application/problem+json`) sin romper a
+        quien ya lea `detail`.
+      required: [detail]
+      additionalProperties: false
+      properties:
+        detail:
+          type: string
+          description: Explicación legible en español.
+          x-status: implemented
+        type:
+          type: string
+          format: uri-reference
+          x-status: proposed
+        title:
+          type: string
+          x-status: proposed
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+          x-status: proposed
+        instance:
+          type: string
+          x-status: proposed
+        code:
+          type: string
+          pattern: ^[a-z][a-z0-9_]*$
+          description: Código estable para automatizar el tratamiento del error.
+          x-status: proposed
+    IngestApplication:
+      type: object
+      description: |
+        Cuerpo de la ingesta; equivale a `NewApplicationIn`. Los campos desconocidos se
+        ignoran. `timezone` debe existir en la base IANA del servidor.
+      x-status: implemented
+      x-source: src/web/conversations/schemas.py::NewApplicationIn
+      required: [external_id, candidate_name, phone, city, job_ref]
+      properties:
+        external_id:
+          type: string
+          minLength: 1
+          maxLength: 60
+          description: Identificador estable de la candidatura en el ATS; clave idempotente de la ingesta.
+        candidate_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        phone:
+          type: string
+          maxLength: 30
+          description: Teléfono para canales de mensajería; puede ir vacío. Propuesto exigir E.164.
+        city:
+          type: string
+          maxLength: 120
+        job_ref:
+          type: string
+          maxLength: 60
+          description: Clave de la oferta en el perfil del cliente (por ejemplo, `repartidores`).
+        timezone:
+          type: string
+          maxLength: 40
+          default: Europe/Madrid
+          description: Zona horaria IANA del candidato.
+        segment:
+          type: string
+          maxLength: 60
+          default: ''
+          description: Segmento de despliegue gradual (por ejemplo, la ciudad). Procede de la ingesta confiable.
+    IngestResult:
+      type: object
+      x-status: implemented
+      x-source: src/web/conversations/schemas.py::IngestOut
+      required: [application_id, candidate_link]
+      additionalProperties: false
+      properties:
+        application_id:
+          type: string
+          format: uuid
+        candidate_link:
+          type: string
+          format: uri
+          pattern: ^https?://.+/c/[0-9a-f]{64}$
+          description: Enlace personal del candidato. Secreto; no registrar en logs.
+    ErasureRequest:
+      type: object
+      x-status: proposed
+      required: [case_ref]
+      additionalProperties: false
+      properties:
+        case_ref:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{1,100}$
+          description: Referencia opaca del expediente (mismas reglas que `redact_candidate --case-ref`).
+        requested_at:
+          type: string
+          format: date-time
+    ErasureAccepted:
+      type: object
+      x-status: proposed
+      required: [status, case_ref]
+      additionalProperties: false
+      properties:
+        status:
+          const: accepted
+        case_ref:
+          type: string
+    ConnectorAck:
+      type: object
+      description: Acuse que el conector debe devolver para que el efecto pase a `sent`.
+      x-status: implemented
+      x-source: src/screening/application/outbox.py::OutboxService.dispatch
+      required: [status]
+      properties:
+        status:
+          const: ok
+    Verdict:
+      type: string
+      description: Veredicto del evaluador (`screening.domain.result.Verdict`).
+      enum: [qualified, not_qualified, review, pool]
+    ResultFlag:
+      type: string
+      description: Señales del evaluador y de la plataforma (`evaluation_failed`, `ats_not_writable`).
+      enum:
+        - prompt_injection_attempt
+        - third_party_data_request
+        - sensitive_data_shared
+        - unclear_requirement
+        - evaluation_failed
+        - ats_not_writable
+    FieldValue:
+      type: object
+      description: Valor extraído con su evidencia literal y la confianza del evaluador.
+      x-status: implemented
+      x-source: src/screening/domain/result.py::FieldValue
+      required: [value, evidence, confidence]
+      properties:
+        value:
+          type: [string, boolean, integer, number, 'null']
+        evidence:
+          type: [string, 'null']
+          description: Cita literal de un mensaje del candidato. Dato personal; se valida que aparezca en la transcripción.
+        confidence:
+          type: string
+          enum: [high, medium, low]
+    ResultFields:
+      type: object
+      description: Campos del resultado por clave del perfil del cliente. Siempre están todas las claves del esquema.
+      propertyNames:
+        pattern: ^[a-z][a-z0-9_]{0,39}$
+      additionalProperties:
+        $ref: '#/components/schemas/FieldValue'
+    StageSentiment:
+      type: object
+      description: Observación de sentimiento por etapa; sin evidencia literal se degrada a `unclear`.
+      x-source: src/screening/domain/result.py::observed_sentiment
+      required: [stage, label, evidence]
+      additionalProperties: false
+      properties:
+        stage:
+          type: string
+          enum: [opening, requirements, matching, closing]
+        label:
+          type: string
+          enum: [positive, neutral, frustrated, unclear]
+        evidence:
+          type: [string, 'null']
+    AtsFieldValues:
+      type: object
+      description: |
+        Valores para el ATS indexados por `ats_field`. Solo se incluyen los campos con valor
+        no nulo. Los nombres los decide el perfil del cliente y la publicación exige que
+        ninguno quede vacío (comprobación E001).
+      propertyNames:
+        minLength: 1
+      additionalProperties:
+        type: [string, boolean, integer, number]
+    AtsWriteResultCommand:
+      type: object
+      x-status: implemented
+      x-source: src/screening/application/assessment.py::enqueue_write_result
+      required: [application_external_id, verdict, fields, summary, stage]
+      additionalProperties: false
+      properties:
+        application_external_id:
+          type: string
+          minLength: 1
+          maxLength: 60
+        verdict:
+          type: string
+          enum: [qualified, not_qualified]
+          description: |
+            Solo llegan decisiones aplicadas de apto o no apto: `review` y `pool` quedan
+            siempre como propuesta y la persona elige apta o no apta.
+        fields:
+          $ref: '#/components/schemas/AtsFieldValues'
+        summary:
+          type: string
+        stage:
+          type: string
+          description: Etapa configurada `stage_qualified` o `stage_not_qualified`; vacía si falta.
+    AtsSetStageCommand:
+      type: object
+      x-status: implemented
+      x-source: src/screening/application/assessment.py::DecisionBookingPolicy.booked
+      required: [application_external_id, stage, note]
+      additionalProperties: false
+      properties:
+        application_external_id:
+          type: string
+          minLength: 1
+          maxLength: 60
+        stage:
+          type: string
+          description: Etapa configurada `stage_interview`.
+        note:
+          type: string
+          pattern: '^Entrevista: .+ en .+$'
+          description: Nota legible con día, hora local del local y nombre del local.
+    SessionRef:
+      type: object
+      required: [id, channel, language, status]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        channel:
+          type: string
+          enum: [web, sim, whatsapp, voice]
+        language:
+          type: string
+          maxLength: 8
+          description: Último idioma observado (ISO 639-1); vacío si no se ha clasificado.
+        status:
+          type: string
+          enum: [active, handed_off, completed, abandoned]
+    ApplicationRef:
+      type: object
+      required: [external_id, application_id]
+      additionalProperties: false
+      properties:
+        external_id:
+          type: string
+          minLength: 1
+          maxLength: 60
+        application_id:
+          type: string
+          format: uuid
+    DecisionRef:
+      type: object
+      required: [id, decision_type, status, autonomy_level, decided_by]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        decision_type:
+          type: string
+          enum: [qualify, reject, review, pool]
+        status:
+          type: string
+          enum: [proposed, applied, overridden, cancelled]
+        autonomy_level:
+          type: integer
+          minimum: 0
+          maximum: 3
+        decided_by:
+          type: string
+          enum: [agent, user]
+    ScreeningResult:
+      type: object
+      required: [verdict, reason, summary, flags, fields, sentiment, evaluator_model]
+      additionalProperties: false
+      properties:
+        verdict:
+          $ref: '#/components/schemas/Verdict'
+        reason:
+          type: string
+        summary:
+          type: string
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultFlag'
+        fields:
+          $ref: '#/components/schemas/ResultFields'
+        sentiment:
+          type: array
+          maxItems: 4
+          items:
+            $ref: '#/components/schemas/StageSentiment'
+        evaluator_model:
+          type: string
+    InterviewRef:
+      type: object
+      required: [booking_id, booking_sequence, slot_id, starts_at_local, site_name]
+      additionalProperties: false
+      properties:
+        booking_id:
+          type: string
+          format: uuid
+          x-status: proposed
+        booking_sequence:
+          type: integer
+          minimum: 0
+          description: Secuencia de la cita (estilo iCalendar SEQUENCE); sube en cada cambio o cancelación.
+          x-status: proposed
+        slot_id:
+          type: string
+          x-status: implemented
+        starts_at:
+          type: string
+          format: date-time
+          x-status: proposed
+        starts_at_local:
+          type: string
+          description: Texto que hoy devuelve la agenda, en la hora del local (por ejemplo, `jueves 29/10/2026 16:00`).
+          x-status: implemented
+        duration_minutes:
+          type: integer
+          minimum: 1
+          x-status: proposed
+        site_name:
+          type: string
+          x-status: implemented
+        site_external_id:
+          type: string
+          x-status: proposed
+        site_timezone:
+          type: string
+          x-status: proposed
+    EventEnvelope:
+      type: object
+      description: Sobre común de los eventos propuestos.
+      x-status: proposed
+      required:
+        - event_id
+        - event_type
+        - schema_version
+        - occurred_at
+        - tenant
+        - idempotency_key
+        - sequence
+        - is_test
+        - application
+        - data
+      properties:
+        event_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - screening.completed
+            - interview.booked
+            - interview.rescheduled
+            - interview.cancelled
+            - handoff.requested
+            - candidate.withdrawn
+            - candidate.erased
+        schema_version:
+          type: string
+          pattern: ^[0-9]+$
+        occurred_at:
+          type: string
+          format: date-time
+        tenant:
+          type: string
+          pattern: ^[a-z0-9_]+$
+        idempotency_key:
+          type: string
+          minLength: 1
+          maxLength: 200
+        sequence:
+          type: integer
+          minimum: 1
+          description: Contador monótono por candidatura; el ATS ignora eventos con secuencia menor que la última aplicada.
+        is_test:
+          type: boolean
+          description: Verdadero para candidaturas creadas desde el ATS simulado o las evals.
+        application:
+          $ref: '#/components/schemas/ApplicationRef'
+        data:
+          type: object
+    ScreeningCompletedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: screening.completed
+        data:
+          type: object
+          required: [session, result, decision, ats_fields, next_step]
+          additionalProperties: false
+          properties:
+            session:
+              $ref: '#/components/schemas/SessionRef'
+            result:
+              $ref: '#/components/schemas/ScreeningResult'
+            decision:
+              $ref: '#/components/schemas/DecisionRef'
+            ats_fields:
+              $ref: '#/components/schemas/AtsFieldValues'
+            next_step:
+              type: string
+              enum: [offer_interview, close_kindly, explain_review, offer_pool]
+    InterviewBookedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: interview.booked
+        data:
+          type: object
+          required: [session_id, stage, interview]
+          additionalProperties: false
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            stage:
+              type: string
+            interview:
+              $ref: '#/components/schemas/InterviewRef'
+    InterviewRescheduledEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: interview.rescheduled
+        data:
+          type: object
+          required: [session_id, rescheduled_by, previous, interview]
+          additionalProperties: false
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            rescheduled_by:
+              type: string
+              enum: [candidate, recruiter, system]
+            previous:
+              $ref: '#/components/schemas/InterviewRef'
+            interview:
+              $ref: '#/components/schemas/InterviewRef'
+    InterviewCancelledEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: interview.cancelled
+        data:
+          type: object
+          required: [session_id, cancelled_by, interview]
+          additionalProperties: false
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            cancelled_by:
+              type: string
+              enum: [candidate, recruiter, system]
+            interview:
+              $ref: '#/components/schemas/InterviewRef'
+    HandoffRequestedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: handoff.requested
+        data:
+          type: object
+          required: [session, reason_code, urgency, flags]
+          additionalProperties: false
+          properties:
+            session:
+              $ref: '#/components/schemas/SessionRef'
+            reason_code:
+              type: string
+              description: |
+                Correspondencia con los eventos internos: `keyword` → `candidate_keyword`;
+                `too_many_messages` → `message_limit`; señales del agente → `guardrail_flags`;
+                `provider_failed` → `provider_failure`; herramienta `handoff_request` →
+                `agent_request`; acción `claim` de la consola → `recruiter_claim`.
+              enum:
+                - candidate_keyword
+                - agent_request
+                - message_limit
+                - guardrail_flags
+                - provider_failure
+                - recruiter_claim
+            urgency:
+              type: string
+              enum: [normal, high]
+            flags:
+              type: array
+              items:
+                type: string
+    CandidateWithdrawnEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: candidate.withdrawn
+        data:
+          type: object
+          required: [session, reason_code]
+          additionalProperties: false
+          properties:
+            session:
+              $ref: '#/components/schemas/SessionRef'
+            reason_code:
+              type: string
+              enum: [channel_opt_out, candidate_request]
+    CandidateErasedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+      unevaluatedProperties: false
+      properties:
+        event_type:
+          const: candidate.erased
+        data:
+          type: object
+          required: [case_ref, origin, erased_at, requested_action]
+          additionalProperties: false
+          properties:
+            case_ref:
+              type: string
+              pattern: ^[A-Za-z0-9_-]{1,100}$
+            origin:
+              type: string
+              enum: [platform, ats]
+            erased_at:
+              type: string
+              format: date-time
+            requested_action:
+              const: erase_application_data
+    GrupoSazonResultFields:
+      type: object
+      description: |
+        Perfil de Grupo Sazón (`seeds/tenants/grupo_sazon/profile.json`, `result_schema`):
+        clave del resultado, campo del ATS (`x-ats-field`) y campo de cribado del cliente al que
+        responde (`x-brief-field`).
+      x-status: implemented
+      required:
+        - nombre_completo
+        - carnet
+        - tipo_carnet
+        - ciudad
+        - zona
+        - local_asignado
+        - disponibilidad
+        - turno
+        - experiencia_anios
+        - experiencia_plataforma
+        - incorporacion
+      additionalProperties: false
+      properties:
+        nombre_completo:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null']}
+          x-ats-field: candidate.name
+          x-brief-field: Nombre completo
+        carnet:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [boolean, 'null']}
+          x-ats-field: custom.licencia
+          x-brief-field: Carnet de conducir
+        tipo_carnet:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null']}
+          x-ats-field: custom.tipo_licencia
+          x-brief-field: Carnet de conducir
+        ciudad:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null']}
+          x-ats-field: custom.ciudad
+          x-brief-field: Ciudad / zona
+        zona:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null']}
+          x-ats-field: custom.zona
+          x-brief-field: Ciudad / zona
+        local_asignado:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null']}
+          x-ats-field: custom.local
+          x-brief-field: Ciudad / zona
+        disponibilidad:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value:
+              enum: [completa, media jornada, fines de semana, null]
+          x-ats-field: custom.disponibilidad
+          x-brief-field: Disponibilidad
+        turno:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value:
+              enum: [mañana, tarde, noche, flexible, null]
+          x-ats-field: custom.turno
+          x-brief-field: Horario preferido
+        experiencia_anios:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [number, 'null'], minimum: 0}
+          x-ats-field: custom.experiencia_anios
+          x-brief-field: Experiencia previa en reparto
+        experiencia_plataforma:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null']}
+          x-ats-field: custom.experiencia_plataforma
+          x-brief-field: Experiencia previa en reparto
+        incorporacion:
+          allOf: [{$ref: '#/components/schemas/FieldValue'}]
+          properties:
+            value: {type: [string, 'null'], format: date}
+          x-ats-field: custom.fecha_inicio
+          x-brief-field: Fecha de incorporación
+    GrupoSazonAtsFields:
+      type: object
+      description: |
+        Campos que la plataforma escribe en el ATS de Grupo Sazón (`fields` de
+        `ats.write_result`). Cada propiedad indica en `x-result-key` la clave del resultado
+        de la que procede. Ninguno es obligatorio: un valor nulo no se envía.
+      x-status: implemented
+      additionalProperties: false
+      properties:
+        candidate.name:
+          type: string
+          x-result-key: nombre_completo
+        custom.licencia:
+          type: boolean
+          x-result-key: carnet
+        custom.tipo_licencia:
+          type: string
+          x-result-key: tipo_carnet
+        custom.ciudad:
+          type: string
+          x-result-key: ciudad
+        custom.zona:
+          type: string
+          x-result-key: zona
+        custom.local:
+          type: string
+          x-result-key: local_asignado
+        custom.disponibilidad:
+          type: string
+          enum: [completa, media jornada, fines de semana]
+          x-result-key: disponibilidad
+        custom.turno:
+          type: string
+          enum: [mañana, tarde, noche, flexible]
+          x-result-key: turno
+        custom.experiencia_anios:
+          type: number
+          minimum: 0
+          x-result-key: experiencia_anios
+        custom.experiencia_plataforma:
+          type: string
+          x-result-key: experiencia_plataforma
+        custom.fecha_inicio:
+          type: string
+          format: date
+          x-result-key: incorporacion
+x-brief-fields:
+  - name: Nombre completo
+    validation: Obligatorio.
+    result_keys: [nombre_completo]
+  - name: Carnet de conducir
+    validation: Sí/No; un No descarta. El tipo se recoge aparte, sin extrapolar categorías entre países.
+    result_keys: [carnet, tipo_carnet]
+  - name: Ciudad / zona
+    validation: Dentro de las áreas de servicio; se concreta en un local con vacantes que el candidato acepta.
+    result_keys: [ciudad, zona, local_asignado]
+  - name: Disponibilidad
+    validation: Jornada completa, media jornada (parcial) o fines de semana.
+    result_keys: [disponibilidad]
+  - name: Horario preferido
+    validation: Mañana, tarde, noche o flexible.
+    result_keys: [turno]
+  - name: Experiencia previa en reparto
+    validation: Años y plataforma; opcional y nunca inferida.
+    result_keys: [experiencia_anios, experiencia_plataforma]
+  - name: Fecha de incorporación
+    validation: Fecha ISO futura en la zona horaria del candidato.
+    result_keys: [incorporacion]
+x-delivery:
+  semantics: at-least-once
+  implemented:
+    outbox: Efecto guardado con clave idempotente única antes de encolar; estados pending, sent y dead.
+    max_attempts: 5
+    backoff_seconds: min(2^intento, 300) tras cada fallo (2, 4, 8 y 16 s)
+    connector_timeout_seconds: 10 en el adaptador MCP; sin límite propio en el conector nativo
+    reconciliation_interval_seconds: 60
+    stale_job_minutes: 10
+    on_exhaustion: El efecto pasa a dead y queda para revisión manual; no se repite a ciegas una escritura ambigua.
+    ordering: Sin garantía entre efectos de la misma candidatura; cada uno es un trabajo independiente.
+  proposed:
+    max_attempts: 8
+    backoff_seconds: exponencial con jitter, de 2 s a 1 h, durante 24 h como máximo
+    request_timeout_seconds: 10
+    success: Cualquier 2xx o 409 por clave ya aplicada.
+    non_retryable: 400, 401, 403, 404, 410 y 422 pasan a revisión manual sin reintentos.
+    ordering: El ATS aplica cambios de etapa solo si `sequence` supera la última aplicada para esa candidatura.
+    reconciliation: Ante un tiempo agotado se consulta el estado en el ATS por clave idempotente antes de repetir.
+x-versioning:
+  implemented:
+    - La ruta lleva la versión mayor (`/api/v1`).
+    - La derivación de la clave de ingesta lleva su versión (`ingest-v1:{tenant_slug}`).
+  proposed:
+    - Cambios aditivos (campos opcionales nuevos, nuevos eventos) sin aviso; los consumidores ignoran lo desconocido.
+    - Un cambio incompatible crea `/api/v2` o `schema_version` nuevo y convive seis meses con el anterior.
+    - Las respuestas de una versión en retirada llevan la cabecera `Sunset` (RFC 8594).
+    - '`info.version` sigue SemVer: mayor para incompatibles, menor para aditivos, parche para texto.'
+x-limits:
+  implemented:
+    ingest_body: Validación por campo (external_id ≤ 60, candidate_name ≤ 200, phone ≤ 30, city ≤ 120, job_ref ≤ 60, timezone ≤ 40, segment ≤ 60) y límite general de Django de 2,5 MiB.
+    replay_window_seconds: 300 hacia atrás, 30 hacia delante; nonce recordado 360 s.
+    ingest_rate: Sin límite propio en la ingesta.
+  proposed:
+    ingest_rate: 120 peticiones por minuto y cliente, ráfaga de 30; 429 con Retry-After.
+    ingest_body_bytes: 16384
+    webhook_body_bytes: 65536
+    webhook_concurrency: 4 entregas simultáneas por cliente.

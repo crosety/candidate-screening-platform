@@ -1,0 +1,224 @@
+{
+  "description": "Offline retrieval eval for the Grupo Sazón rider FAQ. A query is a hit when any expected question heading is among the returned fragments; an empty list means the FAQ has no answer and nothing may pass the threshold.",
+  "source": {
+    "path": "seeds/tenants/grupo_sazon/sources/faq_repartidores.md",
+    "id": "faq_repartidores",
+    "name": "Preguntas frecuentes de repartidores",
+    "kind": "Documento"
+  },
+  "queries": [
+    {
+      "id": "es-01",
+      "kind": "paraphrase_es",
+      "query": "¿Me tengo que comprar una moto para currar con vosotros?",
+      "expected": ["¿Necesito moto propia?", "Do I need my own motorbike?"]
+    },
+    {
+      "id": "es-02",
+      "kind": "paraphrase_es",
+      "query": "¿Cuántas horas a la semana es la jornada completa?",
+      "expected": ["¿Qué tipos de jornada hay?", "Is part-time work available?"]
+    },
+    {
+      "id": "es-03",
+      "kind": "paraphrase_es",
+      "query": "¿A qué hora empieza el turno de noche?",
+      "expected": ["¿Cuáles son los turnos y los horarios?", "What shifts and hours are there?"]
+    },
+    {
+      "id": "es-04",
+      "kind": "paraphrase_es",
+      "query": "¿Me pagáis la gasolina o la pongo yo?",
+      "expected": [
+        "¿Quién paga la gasolina y el mantenimiento de la moto?",
+        "Who pays for fuel, insurance and maintenance?"
+      ]
+    },
+    {
+      "id": "es-05",
+      "kind": "paraphrase_es",
+      "query": "Tengo el carnet caducado, ¿puedo presentarme igual?",
+      "expected": ["¿Mi carné tiene que estar en vigor?", "¿Qué pasa si no tengo carné de conducir?"]
+    },
+    {
+      "id": "es-06",
+      "kind": "paraphrase_es",
+      "query": "¿Con el carnet de coche puedo llevar la moto de reparto?",
+      "expected": [
+        "¿Qué carné necesito para repartir en moto en España?",
+        "¿Importa cuántos años tengo el carné?",
+        "What driving licence do I need?"
+      ]
+    },
+    {
+      "id": "es-07",
+      "kind": "paraphrase_es",
+      "query": "¿Qué día sale el cuadrante con los horarios?",
+      "expected": ["¿Cuándo sé mi horario de cada semana?", "What shifts and hours are there?"]
+    },
+    {
+      "id": "es-08",
+      "kind": "paraphrase_es",
+      "query": "Si me caigo con la moto mientras reparto, ¿qué tengo que hacer?",
+      "expected": ["¿Qué hago si tengo un accidente?"]
+    },
+    {
+      "id": "es-09",
+      "kind": "paraphrase_es",
+      "query": "¿Hay que pagar algo para hacer la entrevista?",
+      "expected": ["¿Se cobra algo por participar en la selección?"]
+    },
+    {
+      "id": "es-10",
+      "kind": "paraphrase_es",
+      "query": "¿Os mando ya una foto del DNI por aquí?",
+      "expected": ["¿Debo enviar documentos por este chat?", "¿Qué documentos necesito para incorporarme?"]
+    },
+    {
+      "id": "es-11",
+      "kind": "paraphrase_es",
+      "query": "¿Tengo que estar dado de alta como autónomo?",
+      "expected": ["¿Qué tipo de contrato es? ¿Tengo que ser autónomo?"]
+    },
+    {
+      "id": "es-12",
+      "kind": "paraphrase_es",
+      "query": "Si está diluviando, ¿hay que salir a repartir igual?",
+      "expected": ["¿Se reparte con lluvia o mal tiempo?"]
+    },
+    {
+      "id": "es-13",
+      "kind": "paraphrase_es",
+      "query": "¿Tenéis algún restaurante en Bilbao?",
+      "expected": ["¿En qué ciudades hay locales?"]
+    },
+    {
+      "id": "es-14",
+      "kind": "paraphrase_es",
+      "query": "¿Me enseñan a usar la aplicación antes de salir a repartir?",
+      "expected": ["¿Hay formación antes de empezar?", "¿Necesito un móvil para trabajar?"]
+    },
+    {
+      "id": "es-15",
+      "kind": "paraphrase_es",
+      "query": "Vivo a 40 minutos del local más cercano, ¿qué opciones tengo?",
+      "expected": [
+        "¿Qué pasa si vivo lejos de un local?",
+        "¿Qué es la bolsa de candidatos?",
+        "¿Puedo elegir el local donde trabajo?"
+      ]
+    },
+    {
+      "id": "mx-01",
+      "kind": "mexican_spanish",
+      "query": "¿Me dan la moto o tengo que poner la mía?",
+      "expected": ["¿Necesito moto propia?", "Do I need my own motorbike?"]
+    },
+    {
+      "id": "mx-02",
+      "kind": "mexican_spanish",
+      "query": "¿Qué licencia de manejo ocupo para repartir en Monterrey?",
+      "expected": ["¿Qué licencia necesito para repartir en moto en México?", "What driving licence do I need?"]
+    },
+    {
+      "id": "mx-03",
+      "kind": "mexican_spanish",
+      "query": "¿Y cuánto es la paga a la semana?",
+      "expected": ["¿Cuánto se cobra?", "How much does the job pay?", "¿Hay pluses, bonos o incentivos por pedido?"]
+    },
+    {
+      "id": "mx-04",
+      "kind": "mexican_spanish",
+      "query": "¿Las propinas son pa' uno o se las queda el restaurante?",
+      "expected": ["¿Las propinas son para mí?", "Do I keep my tips?"]
+    },
+    {
+      "id": "mx-05",
+      "kind": "mexican_spanish",
+      "query": "¿Se puede chambear nomás los fines de semana?",
+      "expected": ["¿Puedo trabajar solo los fines de semana?", "Can I work only on weekends?"]
+    },
+    {
+      "id": "mx-06",
+      "kind": "mexican_spanish",
+      "query": "¿Ocupo experiencia o puedo entrar sin haber repartido antes?",
+      "expected": ["¿Necesito experiencia como repartidor?", "Do I need delivery experience?"]
+    },
+    {
+      "id": "mx-07",
+      "kind": "mexican_spanish",
+      "query": "Estoy en Tijuana, ¿la hora de la entrevista es la de aquí o la de la capital?",
+      "expected": ["¿Cómo se agenda la entrevista y a qué hora es?"]
+    },
+    {
+      "id": "en-01",
+      "kind": "english_over_spanish",
+      "query": "Is there a waiting list if there are no vacancies near me?",
+      "expected": ["¿Qué es la bolsa de candidatos?", "¿Qué pasa si vivo lejos de un local?"]
+    },
+    {
+      "id": "en-02",
+      "kind": "english_over_spanish",
+      "query": "What should I do if I crash the bike during a delivery?",
+      "expected": ["¿Qué hago si tengo un accidente?"]
+    },
+    {
+      "id": "en-03",
+      "kind": "english_over_spanish",
+      "query": "Am I chatting with a bot or a real human?",
+      "expected": ["¿Con quién estoy hablando? ¿Eres una persona?", "How can I talk to a person?"]
+    },
+    {
+      "id": "en-04",
+      "kind": "english_over_spanish",
+      "query": "Can I use a driving licence issued in Venezuela?",
+      "expected": ["¿Sirve un permiso de conducir de otro país?"]
+    },
+    {
+      "id": "en-05",
+      "kind": "english",
+      "query": "do you pay per hour or per delivery?",
+      "expected": ["How much does the job pay?", "¿Cuánto se cobra?", "¿Hay pluses, bonos o incentivos por pedido?"]
+    },
+    {
+      "id": "en-06",
+      "kind": "english",
+      "query": "I study during the week, can I just do weekends?",
+      "expected": [
+        "Can I work only on weekends?",
+        "¿Puedo trabajar solo los fines de semana?",
+        "¿Puedo trabajar a media jornada o compaginarlo con estudios?"
+      ]
+    },
+    {
+      "id": "none-01",
+      "kind": "no_answer",
+      "query": "¿Hay descuento para empleados en la comida de los restaurantes?",
+      "expected": []
+    },
+    {
+      "id": "none-02",
+      "kind": "no_answer",
+      "query": "¿La empresa ayuda a pagar el alquiler de un piso si me mudo de ciudad?",
+      "expected": []
+    },
+    {
+      "id": "none-03",
+      "kind": "no_answer",
+      "query": "¿Hay aparcamiento en el local para dejar mi coche durante el turno?",
+      "expected": []
+    },
+    {
+      "id": "none-04",
+      "kind": "no_answer",
+      "query": "Can I bring my dog with me on the motorbike?",
+      "expected": []
+    },
+    {
+      "id": "none-05",
+      "kind": "no_answer",
+      "query": "¿Quién ganó ayer el partido del Real Madrid?",
+      "expected": []
+    }
+  ]
+}

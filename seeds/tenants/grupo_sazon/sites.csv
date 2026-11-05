@@ -1,0 +1,46 @@
+dataset,external_id,name,city,country,timezone,lat,lng,vacancies_morning,vacancies_afternoon,vacancies_night,vacancies_rotating,has_calendar
+sazon_locales,VLC-RUZ,Sazón Ruzafa,València,ES,Europe/Madrid,39.4623,-0.3756,1,2,2,0,true
+sazon_locales,VLC-BMC,Sazón Benimaclet,València,ES,Europe/Madrid,39.4876,-0.3586,0,3,1,0,true
+sazon_locales,VLC-CAM,Sazón Campanar,València,ES,Europe/Madrid,39.4815,-0.399,1,1,0,0,true
+sazon_locales,VLC-PAT,Sazón Patraix,València,ES,Europe/Madrid,39.46,-0.396,2,0,1,0,true
+sazon_locales,VLC-CAB,Sazón Cabanyal,València,ES,Europe/Madrid,39.47,-0.329,0,2,2,0,true
+sazon_locales,VLC-BCL,Sazón Benicalap,València,ES,Europe/Madrid,39.495,-0.395,0,0,0,0,true
+sazon_locales,CAS-CEN,Sazón Castelló Centre,Castellón,ES,Europe/Madrid,39.9864,-0.0513,1,1,0,0,true
+sazon_locales,CAS-GRA,Sazón Grau de Castelló,Castellón,ES,Europe/Madrid,39.974,0.015,0,1,2,0,true
+sazon_locales,MAD-LAV,Sazón Lavapiés,Madrid,ES,Europe/Madrid,40.4087,-3.701,2,2,1,0,true
+sazon_locales,MAD-CHA,Sazón Chamberí,Madrid,ES,Europe/Madrid,40.434,-3.704,1,0,1,0,true
+sazon_locales,SEV-TRI,Sazón Triana,Sevilla,ES,Europe/Madrid,37.3826,-6.003,1,2,0,0,true
+sazon_locales,SEV-NER,Sazón Nervión,Sevilla,ES,Europe/Madrid,37.383,-5.973,0,2,1,0,false
+sazon_locales,BCN-1,Sazón Barcelona Eixample,Barcelona,ES,Europe/Madrid,41.3874,2.1686,1,1,1,0,true
+sazon_locales,BCN-2,Sazón Barcelona Gracia,Barcelona,ES,Europe/Madrid,41.3944,2.1746,1,1,1,0,true
+sazon_locales,MAL-1,Sazón Málaga Centro,Málaga,ES,Europe/Madrid,36.7213,-4.4214,1,1,1,0,true
+sazon_locales,MAL-2,Sazón Málaga Teatinos,Málaga,ES,Europe/Madrid,36.7283,-4.4154,1,1,1,0,true
+sazon_locales,BIL-1,Sazón Bilbao Abando,Bilbao,ES,Europe/Madrid,43.2630,-2.9350,1,1,1,0,true
+sazon_locales,BIL-2,Sazón Bilbao Deusto,Bilbao,ES,Europe/Madrid,43.2700,-2.9290,1,1,1,0,true
+sazon_locales,ZAZ-1,Sazón Zaragoza Centro,Zaragoza,ES,Europe/Madrid,41.6488,-0.8891,1,1,1,0,true
+sazon_locales,ZAZ-2,Sazón Zaragoza Delicias,Zaragoza,ES,Europe/Madrid,41.6558,-0.8831,1,1,1,0,true
+sazon_locales,MEX-1,Sazón Ciudad de México Centro,Ciudad de México,MX,America/Mexico_City,19.4326,-99.1332,1,1,1,0,true
+sazon_locales,MEX-2,Sazón Ciudad de México Roma,Ciudad de México,MX,America/Mexico_City,19.4396,-99.1272,1,1,1,0,true
+sazon_locales,MEX-3,Sazón Ciudad de México Condesa,Ciudad de México,MX,America/Mexico_City,19.4466,-99.1212,1,1,1,0,true
+sazon_locales,MEX-4,Sazón Ciudad de México Coyoacán,Ciudad de México,MX,America/Mexico_City,19.4536,-99.1152,1,1,1,0,true
+sazon_locales,MEX-5,Sazón Ciudad de México Del Valle,Ciudad de México,MX,America/Mexico_City,19.4606,-99.1092,1,1,1,0,true
+sazon_locales,GDL-1,Sazón Guadalajara Centro,Guadalajara,MX,America/Mexico_City,20.6597,-103.3496,1,1,1,0,true
+sazon_locales,GDL-2,Sazón Guadalajara Americana,Guadalajara,MX,America/Mexico_City,20.6667,-103.3436,1,1,1,0,true
+sazon_locales,GDL-3,Sazón Guadalajara Providencia,Guadalajara,MX,America/Mexico_City,20.6737,-103.3376,1,1,1,0,true
+sazon_locales,GDL-4,Sazón Guadalajara Oblatos,Guadalajara,MX,America/Mexico_City,20.6807,-103.3316,1,1,1,0,true
+sazon_locales,GDL-5,Sazón Guadalajara Chapalita,Guadalajara,MX,America/Mexico_City,20.6877,-103.3256,1,1,1,0,true
+sazon_locales,MTY-1,Sazón Monterrey Centro,Monterrey,MX,America/Monterrey,25.6866,-100.3161,1,1,1,0,true
+sazon_locales,MTY-2,Sazón Monterrey Obispado,Monterrey,MX,America/Monterrey,25.6936,-100.3101,1,1,1,0,true
+sazon_locales,MTY-3,Sazón Monterrey Mitras,Monterrey,MX,America/Monterrey,25.7006,-100.3041,1,1,1,0,true
+sazon_locales,MTY-4,Sazón Monterrey Contry,Monterrey,MX,America/Monterrey,25.7076,-100.2981,1,1,1,0,true
+sazon_locales,MTY-5,Sazón Monterrey Tecnológico,Monterrey,MX,America/Monterrey,25.7146,-100.2921,1,1,1,0,true
+sazon_locales,PUE-1,Sazón Puebla Centro,Puebla,MX,America/Mexico_City,19.0414,-98.2063,1,1,1,0,true
+sazon_locales,PUE-2,Sazón Puebla La Paz,Puebla,MX,America/Mexico_City,19.0484,-98.2003,1,1,1,0,true
+sazon_locales,PUE-3,Sazón Puebla Huexotitla,Puebla,MX,America/Mexico_City,19.0554,-98.1943,1,1,1,0,true
+sazon_locales,PUE-4,Sazón Puebla San Manuel,Puebla,MX,America/Mexico_City,19.0624,-98.1883,1,1,1,0,true
+sazon_locales,PUE-5,Sazón Puebla Las Ánimas,Puebla,MX,America/Mexico_City,19.0694,-98.1823,1,1,1,0,true
+sazon_locales,TIJ-1,Sazón Tijuana Centro,Tijuana,MX,America/Tijuana,32.5149,-117.0382,1,1,1,0,true
+sazon_locales,TIJ-2,Sazón Tijuana Zona Río,Tijuana,MX,America/Tijuana,32.5219,-117.0322,1,1,1,0,true
+sazon_locales,TIJ-3,Sazón Tijuana Otay,Tijuana,MX,America/Tijuana,32.5289,-117.0262,1,1,1,0,true
+sazon_locales,TIJ-4,Sazón Tijuana La Mesa,Tijuana,MX,America/Tijuana,32.5359,-117.0202,1,1,1,0,true
+sazon_locales,TIJ-5,Sazón Tijuana Playas,Tijuana,MX,America/Tijuana,32.5429,-117.0142,1,1,1,0,true

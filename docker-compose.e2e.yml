@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg16-bookworm@sha256:00ba258a66dac104fd5171074a0084462a64a1369d8513f3d0a634e2f24d15bc
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports: ["127.0.0.1:15432:5432"]
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine@sha256:892022f9f18c26c92c30e15194d132f90044af87b94a491a75429bbc3982eab1
+    ports: ["127.0.0.1:16379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: { context: ., dockerfile: docker/python.Dockerfile }
+    command: sh -c "python manage.py migrate --noinput && uvicorn web.asgi:application --host 0.0.0.0 --port 8000 --no-access-log --log-level warning --reload --reload-dir src"
+    environment: &backend_environment
+      DATABASE_URL: postgres://screening:screening@postgres:5432/screening
+      REDIS_URL: redis://redis:6379/0
+      DJANGO_SECRET_KEY: e2e-isolated-not-a-real-secret
+      DJANGO_DEBUG: "false"
+      INGEST_TOKEN: e2e-only
+      SEED_PASSWORD: e2e-only-password
+      LLM_MODE: fake
+      LANGFUSE_ENABLED: "false"
+      LANGFUSE_PROJECT_ID: e2e-metrics
+      LANGFUSE_HOST: https://cloud.langfuse.com
+      PUBLISH_REQUIRES_EVALS: "false"
+      CHAT_BASE_URL: http://localhost:15174
+      META_SEND_ENABLED: "false"
+      CSRF_TRUSTED_ORIGINS: http://localhost:15173,http://localhost:15174
+    ports: ["127.0.0.1:18000:8000"]
+    volumes:
+      - ./src:/app/src:ro
+      - ./seeds:/app/seeds:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 5s
+      retries: 30
+
+  worker:
+    build: { context: ., dockerfile: docker/python.Dockerfile }
+    command: python manage.py run_worker
+    environment: *backend_environment
+    volumes:
+      - ./src:/app/src:ro
+      - ./seeds:/app/seeds:ro
+    depends_on:
+      api: { condition: service_healthy }
+
+  mcp-registro:
+    build: { context: ., dockerfile: docker/python.Dockerfile }
+    command: python services/mcp-registro/server.py
+    ports: ["127.0.0.1:18100:8100"]
+    volumes:
+      - ./services/mcp-registro:/app/services/mcp-registro:ro
+
+  console:
+    build: { context: ., dockerfile: docker/node.Dockerfile }
+    command: pnpm --filter console dev --host 0.0.0.0
+    environment:
+      API_TARGET: http://api:8000
+    ports: ["127.0.0.1:15173:5173"]
+    volumes:
+      - ./apps/console/src:/app/apps/console/src:ro
+      - ./packages/api-client/src:/app/packages/api-client/src:ro
+    depends_on:
+      api: { condition: service_healthy }
+
+  chat:
+    build: { context: ., dockerfile: docker/node.Dockerfile }
+    command: pnpm --filter chat dev --host 0.0.0.0
+    environment:
+      API_TARGET: http://api:8000
+    ports: ["127.0.0.1:15174:5174"]
+    volumes:
+      - ./apps/chat/src:/app/apps/chat/src:ro
+      - ./packages/api-client/src:/app/packages/api-client/src:ro
+    depends_on:
+      api: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  pgvector_data:

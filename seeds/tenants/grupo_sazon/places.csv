@@ -1,0 +1,62 @@
+dataset,name,aliases,city,lat,lng
+sazon_locales,València,Valencia|Valencia centro|València centre,València,39.4699,-0.3763
+sazon_locales,Ruzafa,Russafa|Ruzafa,València,39.461,-0.374
+sazon_locales,Benimaclet,Benimaclet,València,39.486,-0.36
+sazon_locales,Campanar,Campanar,València,39.48,-0.4
+sazon_locales,Patraix,Patraix,València,39.459,-0.399
+sazon_locales,El Cabanyal,Cabanyal|Cabañal|El Cabañal,València,39.469,-0.33
+sazon_locales,Benicalap,Benicalap,València,39.496,-0.396
+sazon_locales,El Grao,Grao|El Grau|Grau|Grao de Valencia|Grau de València,València,39.459,-0.331
+sazon_locales,Alboraya,Alboraia|Alboraya,Alboraya,39.5,-0.35
+sazon_locales,Mislata,Mislata,Mislata,39.475,-0.418
+sazon_locales,Torrent,Torrente|Torrent,Torrent,39.437,-0.465
+sazon_locales,Castellón,Castelló|Castellón de la Plana|Castelló de la Plana|Castellon,Castellón,39.9864,-0.0513
+sazon_locales,El Grao,Grao|El Grau|Grau|Grao de Castellón|Grau de Castelló,Castellón,39.973,0.014
+sazon_locales,Madrid,Madrid centro,Madrid,40.4168,-3.7038
+sazon_locales,Lavapiés,Lavapies|Lavapiés,Madrid,40.4085,-3.7005
+sazon_locales,Chamberí,Chamberi|Chamberí,Madrid,40.435,-3.703
+sazon_locales,Sevilla,Sevilla centro,Sevilla,37.3891,-5.9845
+sazon_locales,Triana,Triana,Sevilla,37.383,-6.002
+sazon_locales,Nervión,Nervion|Nervión,Sevilla,37.384,-5.972
+sazon_locales,Barcelona,Barcelona,Barcelona,41.3874,2.1686
+sazon_locales,Eixample,Eixample Barcelona,Barcelona,41.3874,2.1686
+sazon_locales,Gracia,Gracia Barcelona,Barcelona,41.3944,2.1746
+sazon_locales,Málaga,Málaga,Málaga,36.7213,-4.4214
+sazon_locales,Centro,Centro Málaga,Málaga,36.7213,-4.4214
+sazon_locales,Teatinos,Teatinos Málaga,Málaga,36.7283,-4.4154
+sazon_locales,Bilbao,Bilbao,Bilbao,43.263,-2.935
+sazon_locales,Abando,Abando Bilbao,Bilbao,43.2630,-2.9350
+sazon_locales,Deusto,Deusto Bilbao,Bilbao,43.2700,-2.9290
+sazon_locales,Zaragoza,Zaragoza,Zaragoza,41.6488,-0.8891
+sazon_locales,Centro,Centro Zaragoza,Zaragoza,41.6488,-0.8891
+sazon_locales,Delicias,Delicias Zaragoza,Zaragoza,41.6558,-0.8831
+sazon_locales,Ciudad de México,CDMX|Ciudad de Mexico,Ciudad de México,19.4326,-99.1332
+sazon_locales,Centro,Centro Ciudad de México,Ciudad de México,19.4326,-99.1332
+sazon_locales,Roma,Roma Ciudad de México,Ciudad de México,19.4396,-99.1272
+sazon_locales,Condesa,Condesa Ciudad de México,Ciudad de México,19.4466,-99.1212
+sazon_locales,Coyoacán,Coyoacán Ciudad de México,Ciudad de México,19.4536,-99.1152
+sazon_locales,Del Valle,Del Valle Ciudad de México,Ciudad de México,19.4606,-99.1092
+sazon_locales,Guadalajara,Guadalajara,Guadalajara,20.6597,-103.3496
+sazon_locales,Centro,Centro Guadalajara,Guadalajara,20.6597,-103.3496
+sazon_locales,Americana,Americana Guadalajara,Guadalajara,20.6667,-103.3436
+sazon_locales,Providencia,Providencia Guadalajara,Guadalajara,20.6737,-103.3376
+sazon_locales,Oblatos,Oblatos Guadalajara,Guadalajara,20.6807,-103.3316
+sazon_locales,Chapalita,Chapalita Guadalajara,Guadalajara,20.6877,-103.3256
+sazon_locales,Monterrey,Monterrey,Monterrey,25.6866,-100.3161
+sazon_locales,Centro,Centro Monterrey,Monterrey,25.6866,-100.3161
+sazon_locales,Obispado,Obispado Monterrey,Monterrey,25.6936,-100.3101
+sazon_locales,Mitras,Mitras Monterrey,Monterrey,25.7006,-100.3041
+sazon_locales,Contry,Contry Monterrey,Monterrey,25.7076,-100.2981
+sazon_locales,Tecnológico,Tecnológico Monterrey,Monterrey,25.7146,-100.2921
+sazon_locales,Puebla,Puebla,Puebla,19.0414,-98.2063
+sazon_locales,Centro,Centro Puebla,Puebla,19.0414,-98.2063
+sazon_locales,La Paz,La Paz Puebla,Puebla,19.0484,-98.2003
+sazon_locales,Huexotitla,Huexotitla Puebla,Puebla,19.0554,-98.1943
+sazon_locales,San Manuel,San Manuel Puebla,Puebla,19.0624,-98.1883
+sazon_locales,Las Ánimas,Las Ánimas Puebla,Puebla,19.0694,-98.1823
+sazon_locales,Tijuana,Tijuana,Tijuana,32.5149,-117.0382
+sazon_locales,Centro,Centro Tijuana,Tijuana,32.5149,-117.0382
+sazon_locales,Zona Río,Zona Río Tijuana,Tijuana,32.5219,-117.0322
+sazon_locales,Otay,Otay Tijuana,Tijuana,32.5289,-117.0262
+sazon_locales,La Mesa,La Mesa Tijuana,Tijuana,32.5359,-117.0202
+sazon_locales,Playas,Playas Tijuana,Tijuana,32.5429,-117.0142

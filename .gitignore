@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+.runtime-secrets/
+.local/
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+test-results/
+playwright-report/
+output/delivery/
+
+# Agent working notes and evaluation reports
+.scratch/
+.claude/worktrees/
+.claude/settings.local.json

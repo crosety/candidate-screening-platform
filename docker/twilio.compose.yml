@@ -1,0 +1,14 @@
+# Opt-in only. Never put credentials in compose environment or command arguments.
+services:
+  api:
+    environment:
+      TWILIO_CONFIG_FILE: /run/secrets/twilio_config
+    secrets: [twilio_config]
+  worker:
+    environment:
+      TWILIO_CONFIG_FILE: /run/secrets/twilio_config
+    secrets: [twilio_config]
+
+secrets:
+  twilio_config:
+    file: ./.runtime-secrets/twilio.json

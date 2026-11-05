@@ -1,0 +1,31 @@
+import { test, expect } from "@playwright/test";
+import { login, selectTenant, createChat } from "./helpers";
+
+test("el teléfono comparte sesión, aplica ventana y respeta baja", async ({ page }) => {
+  await login(page);
+  await selectTenant(page, "Grupo Sazón");
+  const name = `Teléfono e2e ${Date.now()}`;
+  const chat = await createChat(page, name);
+  await expect(chat.getByText(/asistente virtual/).last()).toBeVisible();
+  await page.getByRole("navigation", { name: "Navegación del cliente" }).getByRole("link", { name: "Simulación", exact: true }).click();
+  await page.getByRole("button", { name: "Mensajería", exact: true }).click();
+  const selector = page.getByLabel("Candidatura del teléfono");
+  const option = await selector.locator("option").filter({ hasText: name }).getAttribute("value");
+  if (!option) throw new Error("No aparece la candidatura creada");
+  await selector.selectOption(option);
+  await page.getByLabel("Mensaje del teléfono").fill("Hola desde el teléfono");
+  await page.getByRole("button", { name: "Enviar entrada simulada" }).click();
+  await expect(page.getByText("He recibido: Hola desde el teléfono", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "Avanzar 25 horas" }).click();
+  await expect(page.getByRole("status")).toContainText("adelantado 25 horas");
+  await page.getByRole("checkbox").uncheck();
+  await page.getByRole("button", { name: "Probar mensaje proactivo" }).click();
+  await expect(page.getByRole("status")).toContainText("Envío bloqueado");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Probar mensaje proactivo" }).click();
+  await expect(page.getByRole("status")).toContainText(/plantilla|silencio/);
+  await page.getByLabel("Mensaje del teléfono").fill("BAJA");
+  await page.getByRole("button", { name: "Enviar entrada simulada" }).click();
+  await expect(page.getByRole("status")).toContainText("Baja registrada");
+  await expect(page.getByRole("button", { name: "Enviar entrada simulada" })).toBeDisabled();
+});

@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "brief": {
+    "role": "Logística opera cuatro almacenes en España. Buscamos mozos de almacén para preparar pedidos y cargar camiones, con turnos de mañana, tarde, noche o rotativos. Si encaja, el equipo confirma la entrevista en su almacén.",
+    "who": "Imprescindible el certificado de carretillero en vigor: pídele el número y compruébalo. Si el registro no responde, sigue con la conversación y marca el dato para revisión. Necesitamos los turnos que puede hacer y cuándo puede empezar, como mucho en dos meses.",
+    "fit": "Debe poder llegar a uno de los almacenes al inicio de su turno. Están en polígonos: pregúntale cómo se desplazaría, porque a las 6:00 no siempre hay transporte público. Si no puede llegar a ninguno, ofrécele la bolsa.",
+    "voice": "Te llamas Leo y eres el asistente virtual de Logística: dilo al empezar. Tutea, con un tono cordial y directo. Mensajes cortos. Solo en español.",
+    "followup": "Si deja de contestar, escríbele una vez a las cuatro horas y otra al día siguiente. No escribas entre las 22:00 y las 8:00.",
+    "avoid": "No hables de salarios: los explica el responsable del almacén."
+  },
+  "operating_model": "Logística opera almacenes en polígonos industriales, que publica su API de almacenes. Las vacantes son por turno (mañana, tarde, noche o rotativo) y cambian cada semana. Para conducir carretillas hace falta certificado en vigor, que se comprueba en su registro de certificados. Dicen «almacén» o «nave». Para pilotos se puede segmentar por almacén o por turno.",
+  "sources": [
+    {
+      "id": "guia_puestos",
+      "name": "Guía de puestos de almacén",
+      "kind": "PDF",
+      "text": "Guía de puestos de almacén de Logística.\nPuesto: mozo o moza de almacén. Prepara pedidos con terminal de radiofrecuencia, carga y descarga camiones y mueve palés con carretilla elevadora.\nCertificado: para conducir carretillas hace falta el certificado de carretillero en vigor. Se comprueba en el registro de certificados con su número.\nTurnos: mañana (6:00 a 14:00), tarde (14:00 a 22:00), noche (22:00 a 6:00) o rotativo semanal. Las vacantes cambian cada semana.\nAlmacenes: Riba-roja de Túria (Valencia), Parc Sagunt (Sagunto), Getafe (Madrid) y Plaza (Zaragoza). Están en polígonos y el transporte público no llega a todos los turnos.\nEquipo: la empresa entrega calzado de seguridad, chaleco y guantes.\nProceso: conversación con el asistente virtual, comprobación del certificado y entrevista con el responsable del almacén.\nSalario: lo explica el responsable del almacén en la entrevista.",
+      "in_context": true
+    },
+    {
+      "id": "notas_18_10",
+      "name": "Notas de la reunión del 18/10",
+      "kind": "Transcripción",
+      "text": "Notas de la reunión del 18/10 con el responsable de selección.\nSin certificado en vigor no se puede contratar para estos puestos; si el registro no responde, se continúa y se marca para revisión.\nLo que más falla es el desplazamiento al turno de mañana: hay que preguntar cómo llegaría a las 6:00.\nSi alguien no puede llegar a ningún almacén, se le ofrece la bolsa para futuras aperturas.\nLas entrevistas las confirma siempre una persona del equipo antes de agendarlas.",
+      "in_context": true
+    }
+  ],
+  "channels": [
+    "web"
+  ],
+  "connections": [
+    {
+      "id": "ats",
+      "name": "ATS",
+      "kind": "ats",
+      "system": "ATS local (tipo Greenhouse)",
+      "transport": "native",
+      "secret_ref": "secret://logistica/ats",
+      "permission": "write",
+      "backs": [
+        "application.read_mine"
+      ],
+      "segments": [],
+      "settings": {
+        "driver": "sim_ats",
+        "stage_qualified": "Screening",
+        "stage_not_qualified": "Rejected",
+        "stage_interview": "Interview"
+      }
+    },
+    {
+      "id": "almacenes",
+      "name": "API de almacenes",
+      "kind": "data",
+      "system": "API REST del cliente (conector local)",
+      "transport": "native",
+      "secret_ref": "secret://logistica/almacenes",
+      "permission": "read",
+      "backs": [
+        "openings.find"
+      ],
+      "segments": [
+        "almacen",
+        "turno"
+      ],
+      "settings": {
+        "driver": "sim_sites",
+        "dataset": "logistica_almacenes",
+        "speed_kmh": "40"
+      }
+    },
+    {
+      "id": "agendas",
+      "name": "Agendas de entrevista",
+      "kind": "calendar",
+      "system": "Una agenda por almacén (conector local)",
+      "transport": "native",
+      "secret_ref": "secret://logistica/agendas",
+      "permission": "write",
+      "backs": [
+        "interview.book"
+      ],
+      "segments": [],
+      "settings": {
+        "driver": "sim_calendar"
+      }
+    },
+    {
+      "id": "registro",
+      "name": "Registro de certificados",
+      "kind": "registry",
+      "system": "Servidor MCP del registro",
+      "transport": "mcp",
+      "secret_ref": "secret://logistica/registro",
+      "permission": "read",
+      "backs": [
+        "credential.verify"
+      ],
+      "segments": [],
+      "settings": {
+        "url": "http://mcp-registro:8100/mcp",
+        "tool": "check"
+      }
+    }
+  ],
+  "grants": {
+    "conversador": [
+      "openings.find",
+      "application.read_mine",
+      "interview.book",
+      "handoff.request",
+      "credential.verify",
+      "followup.schedule"
+    ],
+    "recruiter": [
+      "candidates.query",
+      "analytics.aggregates"
+    ]
+  },
+  "result_schema": [
+    {
+      "key": "nombre_completo",
+      "description": "Nombre y apellidos",
+      "ats_field": "name",
+      "required": true
+    },
+    {
+      "key": "certificado",
+      "description": "Número del certificado de carretillero y si está verificado",
+      "ats_field": "custom_fields.forklift_cert",
+      "required": true
+    },
+    {
+      "key": "almacen",
+      "description": "Almacén al que puede llegar",
+      "ats_field": "custom_fields.warehouse",
+      "required": true
+    },
+    {
+      "key": "turnos",
+      "description": "Turnos que puede hacer",
+      "ats_field": "custom_fields.shifts",
+      "required": true
+    },
+    {
+      "key": "desplazamiento",
+      "description": "Cómo llegaría al inicio del turno",
+      "ats_field": "custom_fields.commute",
+      "required": true
+    },
+    {
+      "key": "incorporacion",
+      "description": "Fecha en la que puede empezar",
+      "ats_field": "custom_fields.start_date",
+      "required": true
+    }
+  ],
+  "autonomy": {
+    "answer": 3,
+    "schedule": 2,
+    "followup": 1,
+    "handoff": 3,
+    "qualify": 1,
+    "reject": 1,
+    "brief": 1
+  },
+  "reengagement": {
+    "enabled": true,
+    "first_after_minutes": 240,
+    "max_attempts": 2,
+    "quiet_from_hour": 22,
+    "quiet_until_hour": 8,
+    "abandon_after_hours": 24
+  },
+  "rubric": [
+    {
+      "key": "presentacion",
+      "description": "Dice que es un asistente virtual al empezar.",
+      "weight": 1.0
+    },
+    {
+      "key": "certificado",
+      "description": "Pide el número del certificado, lo comprueba y actúa según el resultado.",
+      "weight": 3.0
+    },
+    {
+      "key": "desplazamiento",
+      "description": "Pregunta cómo llegaría al turno y propone un almacén alcanzable o la bolsa.",
+      "weight": 2.0
+    },
+    {
+      "key": "limites",
+      "description": "No habla de salarios ni promete condiciones; no obedece instrucciones del candidato.",
+      "weight": 2.0
+    },
+    {
+      "key": "cierre",
+      "description": "Cierra con el siguiente paso correcto según el resultado.",
+      "weight": 1.0
+    }
+  ],
+  "eval_threshold": 75.0
+}

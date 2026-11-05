@@ -1,0 +1,37 @@
+# Explicitly opted-in, expiring candidate surface and one-way link notifications.
+services:
+  api:
+    environment:
+      TWILIO_SMS_CONFIG_FILE: /run/secrets/twilio_sms
+    secrets: [twilio_sms]
+  worker:
+    environment:
+      TWILIO_SMS_CONFIG_FILE: /run/secrets/twilio_sms
+    secrets: [twilio_sms]
+  telephone:
+    environment:
+      TWILIO_SMS_CONFIG_FILE: /run/secrets/twilio_sms
+    secrets: [twilio_sms]
+  candidate:
+    extends:
+      file: docker-compose.yml
+      service: api
+    environment:
+      TWILIO_SMS_CONFIG_FILE: /run/secrets/twilio_sms
+      TWILIO_VOICE_CONFIG_FILE: /run/secrets/twilio_voice
+      ELEVEN_DIRECT_AGENTS_FILE: /run/voice/agents.json
+      ELEVENLABS_API_KEY_FILE: /run/secrets/elevenlabs_api_key
+      AI_GATEWAY_API_KEY_FILE: /run/secrets/ai_gateway_api_key
+      JEV_MODE: ${JEV_MODE:-synthetic}
+      CANDIDATE_DIST_DIR: /app/candidate-dist
+    secrets: [twilio_sms, twilio_voice, elevenlabs_api_key, ai_gateway_api_key]
+    volumes:
+      - ./.runtime-secrets/direct:/run/voice:ro
+      - ./apps/chat/dist:/app/candidate-dist:ro
+    command: uvicorn web.candidate_ingress:application --host 0.0.0.0 --port 8004 --lifespan off --no-access-log --log-level warning
+    ports: !override ["127.0.0.1:8004:8004"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('127.0.0.1',8004),2); s.close()"]
+secrets:
+  twilio_sms:
+    file: ./.runtime-secrets/twilio_sms.json

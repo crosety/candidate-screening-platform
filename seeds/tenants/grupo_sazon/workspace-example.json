@@ -1,0 +1,709 @@
+{
+  "key": "sazon-repartidores",
+  "offers": [
+    "repartidores"
+  ],
+  "candidates": [
+    {
+      "key": "lucia",
+      "name": "Lucía Ferrer Pons",
+      "phone": "+34000000201",
+      "offer": "repartidores",
+      "status": "completed",
+      "hours_ago": 26,
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Me llamo Lucía Ferrer Pons"
+        },
+        {
+          "direction": "out",
+          "text": "Encantada, Lucía. ¿Tienes carnet de conducir en vigor? ¿De qué tipo?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, tengo el A2 desde hace tres años"
+        },
+        {
+          "direction": "out",
+          "text": "Perfecto. ¿En qué ciudad y barrio vives?"
+        },
+        {
+          "direction": "in",
+          "text": "En València, en Russafa"
+        },
+        {
+          "direction": "out",
+          "text": "¿Qué disponibilidad tienes y qué turno prefieres?"
+        },
+        {
+          "direction": "in",
+          "text": "Jornada completa, mejor de tarde"
+        },
+        {
+          "direction": "out",
+          "text": "¿Tienes experiencia en reparto?"
+        },
+        {
+          "direction": "in",
+          "text": "Dos años repartiendo para una pizzería del barrio"
+        },
+        {
+          "direction": "out",
+          "text": "Sazón Ruzafa está a 4 minutos en moto y tiene vacantes de tarde. ¿Te encaja?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, me viene genial"
+        },
+        {
+          "direction": "out",
+          "text": "¿Desde qué fecha podrías incorporarte?"
+        },
+        {
+          "direction": "in",
+          "text": "Puedo empezar el 9 de noviembre"
+        },
+        {
+          "direction": "out",
+          "text": "Resumen: A2, Russafa, jornada completa de tarde, dos años de experiencia, Sazón Ruzafa desde el 9/11. ¿Es correcto?"
+        },
+        {
+          "direction": "in",
+          "text": "Correcto"
+        },
+        {
+          "direction": "out",
+          "text": "Encajas. Tengo huecos con el encargado el jueves a las 17:00 o el viernes a las 11:30. ¿Cuál prefieres?"
+        },
+        {
+          "direction": "in",
+          "text": "El jueves a las 17:00"
+        },
+        {
+          "direction": "out",
+          "text": "Reservado: entrevista de 15 minutos el jueves a las 17:00 en Sazón Ruzafa. ¡Hasta pronto!"
+        }
+      ],
+      "fields": {
+        "nombre_completo": {
+          "value": "Lucía Ferrer Pons",
+          "evidence": "Me llamo Lucía Ferrer Pons",
+          "confidence": "high"
+        },
+        "carnet": {
+          "value": true,
+          "evidence": "Sí, tengo el A2 desde hace tres años",
+          "confidence": "high"
+        },
+        "tipo_carnet": {
+          "value": "A2",
+          "evidence": "Sí, tengo el A2 desde hace tres años",
+          "confidence": "high"
+        },
+        "ciudad": {
+          "value": "València",
+          "evidence": "En València, en Russafa",
+          "confidence": "high"
+        },
+        "zona": {
+          "value": "Russafa",
+          "evidence": "En València, en Russafa",
+          "confidence": "high"
+        },
+        "local_asignado": {
+          "value": "Sazón Ruzafa",
+          "evidence": "Sí, me viene genial",
+          "confidence": "medium"
+        },
+        "disponibilidad": {
+          "value": "completa",
+          "evidence": "Jornada completa, mejor de tarde",
+          "confidence": "high"
+        },
+        "turno": {
+          "value": "tarde",
+          "evidence": "Jornada completa, mejor de tarde",
+          "confidence": "high"
+        },
+        "experiencia_anios": {
+          "value": 2,
+          "evidence": "Dos años repartiendo para una pizzería del barrio",
+          "confidence": "high"
+        },
+        "experiencia_plataforma": {
+          "value": "Reparto propio de una pizzería",
+          "evidence": "Dos años repartiendo para una pizzería del barrio",
+          "confidence": "medium"
+        },
+        "incorporacion": {
+          "value": "2026-11-09",
+          "evidence": "Puedo empezar el 9 de noviembre",
+          "confidence": "high"
+        }
+      },
+      "summary": "Apta: A2, Russafa, jornada completa de tarde y dos años de experiencia. Sazón Ruzafa desde el 09/11; entrevista reservada el jueves a las 17:00.",
+      "verdict": "qualified",
+      "decision": "applied",
+      "interview": {
+        "site_id": "VLC-RUZ",
+        "weekday": 3,
+        "time": "17:00"
+      }
+    },
+    {
+      "key": "andres",
+      "name": "Andrés Gil Navarro",
+      "phone": "+34000000202",
+      "offer": "repartidores",
+      "status": "completed",
+      "hours_ago": 20,
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Andrés Gil Navarro"
+        },
+        {
+          "direction": "out",
+          "text": "Gracias, Andrés. ¿Tienes carnet de conducir en vigor?"
+        },
+        {
+          "direction": "in",
+          "text": "No, ahora mismo no tengo carnet"
+        },
+        {
+          "direction": "out",
+          "text": "Entendido. El carnet es imprescindible para esta oferta, así que el equipo de selección revisará tu candidatura y te dirá algo. ¿En qué ciudad vives?"
+        },
+        {
+          "direction": "in",
+          "text": "En València, por Benimaclet"
+        },
+        {
+          "direction": "out",
+          "text": "Gracias por tu tiempo, Andrés. Selección revisará tu caso y te contactará."
+        }
+      ],
+      "fields": {
+        "nombre_completo": {
+          "value": "Andrés Gil Navarro",
+          "evidence": "Andrés Gil Navarro",
+          "confidence": "high"
+        },
+        "carnet": {
+          "value": false,
+          "evidence": "No, ahora mismo no tengo carnet",
+          "confidence": "high"
+        },
+        "ciudad": {
+          "value": "València",
+          "evidence": "En València, por Benimaclet",
+          "confidence": "high"
+        },
+        "zona": {
+          "value": "Benimaclet",
+          "evidence": "En València, por Benimaclet",
+          "confidence": "high"
+        }
+      },
+      "summary": "Sin carnet vigente, requisito imprescindible. Propuesta de descarte pendiente de revisión humana.",
+      "verdict": "not_qualified",
+      "decision": "proposed"
+    },
+    {
+      "key": "javi",
+      "name": "Javier Ortega Ruiz",
+      "phone": "+34000000203",
+      "offer": "repartidores",
+      "status": "completed",
+      "hours_ago": 30,
+      "city": "Torrent",
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Javier Ortega Ruiz"
+        },
+        {
+          "direction": "out",
+          "text": "¿Tienes carnet de conducir en vigor?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, el B desde hace seis años"
+        },
+        {
+          "direction": "out",
+          "text": "¿Dónde vives?"
+        },
+        {
+          "direction": "in",
+          "text": "Vivo en Torrent"
+        },
+        {
+          "direction": "out",
+          "text": "¿Qué disponibilidad y turno buscas?"
+        },
+        {
+          "direction": "in",
+          "text": "Fines de semana, de noche"
+        },
+        {
+          "direction": "out",
+          "text": "El local más cercano con vacantes de noche es Sazón Patraix, a unos 25 minutos en moto. ¿Te vendría bien?"
+        },
+        {
+          "direction": "in",
+          "text": "Me pilla demasiado lejos, prefiero algo en Torrent"
+        },
+        {
+          "direction": "out",
+          "text": "Lo entiendo. ¿Quieres que te incluyamos en la bolsa para avisarte si se abre algo más cerca?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, apúntame en la bolsa"
+        },
+        {
+          "direction": "out",
+          "text": "Hecho. ¿Desde cuándo podrías empezar?"
+        },
+        {
+          "direction": "in",
+          "text": "Desde el 1 de diciembre"
+        },
+        {
+          "direction": "out",
+          "text": "Gracias, Javier. Te avisaremos si hay vacantes más cerca."
+        }
+      ],
+      "fields": {
+        "nombre_completo": {
+          "value": "Javier Ortega Ruiz",
+          "evidence": "Javier Ortega Ruiz",
+          "confidence": "high"
+        },
+        "carnet": {
+          "value": true,
+          "evidence": "Sí, el B desde hace seis años",
+          "confidence": "high"
+        },
+        "tipo_carnet": {
+          "value": "B",
+          "evidence": "Sí, el B desde hace seis años",
+          "confidence": "high"
+        },
+        "ciudad": {
+          "value": "Torrent",
+          "evidence": "Vivo en Torrent",
+          "confidence": "high"
+        },
+        "zona": {
+          "value": "Torrent",
+          "evidence": "Vivo en Torrent",
+          "confidence": "high"
+        },
+        "disponibilidad": {
+          "value": "fines de semana",
+          "evidence": "Fines de semana, de noche",
+          "confidence": "high"
+        },
+        "turno": {
+          "value": "noche",
+          "evidence": "Fines de semana, de noche",
+          "confidence": "high"
+        },
+        "incorporacion": {
+          "value": "2026-12-01",
+          "evidence": "Desde el 1 de diciembre",
+          "confidence": "high"
+        }
+      },
+      "summary": "Cumple requisitos pero el local más cercano (Patraix, 25 min) no le encaja. En bolsa para Torrent.",
+      "verdict": "pool",
+      "decision": "proposed"
+    },
+    {
+      "key": "maite",
+      "name": "Maite Etxeberria Sanz",
+      "phone": "+34000000204",
+      "offer": "repartidores",
+      "status": "completed",
+      "hours_ago": 40,
+      "city": "Oviedo",
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Maite Etxeberria Sanz"
+        },
+        {
+          "direction": "out",
+          "text": "¿Tienes carnet de conducir en vigor?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, tengo el A1"
+        },
+        {
+          "direction": "out",
+          "text": "¿En qué ciudad y zona vives?"
+        },
+        {
+          "direction": "in",
+          "text": "En Oviedo, en el centro"
+        },
+        {
+          "direction": "out",
+          "text": "Ahora mismo no tenemos locales en Oviedo. ¿Te apunto en la bolsa por si abrimos allí?"
+        },
+        {
+          "direction": "in",
+          "text": "Vale, apúntame"
+        },
+        {
+          "direction": "out",
+          "text": "Hecho, Maite. Te avisaremos si abrimos en Oviedo."
+        }
+      ],
+      "fields": {
+        "nombre_completo": {
+          "value": "Maite Etxeberria Sanz",
+          "evidence": "Maite Etxeberria Sanz",
+          "confidence": "high"
+        },
+        "carnet": {
+          "value": true,
+          "evidence": "Sí, tengo el A1",
+          "confidence": "high"
+        },
+        "tipo_carnet": {
+          "value": "A1",
+          "evidence": "Sí, tengo el A1",
+          "confidence": "high"
+        },
+        "ciudad": {
+          "value": "Oviedo",
+          "evidence": "En Oviedo, en el centro",
+          "confidence": "high"
+        },
+        "zona": {
+          "value": "Centro",
+          "evidence": "En Oviedo, en el centro",
+          "confidence": "high"
+        }
+      },
+      "summary": "Sin locales en Oviedo. Acepta la bolsa; faltan disponibilidad e incorporación.",
+      "verdict": "pool",
+      "decision": "proposed"
+    },
+    {
+      "key": "emily",
+      "name": "Emily Carter",
+      "phone": "+52000000205",
+      "offer": "repartidores",
+      "status": "completed",
+      "hours_ago": 8,
+      "city": "Ciudad de México",
+      "timezone": "America/Mexico_City",
+      "language": "en",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Hi! I'm Emily Carter, sorry, my Spanish isn't great"
+        },
+        {
+          "direction": "out",
+          "text": "No problem, Emily, we can continue in English. Do you have a valid driving licence?"
+        },
+        {
+          "direction": "in",
+          "text": "Yes, I have a Mexican motorcycle licence"
+        },
+        {
+          "direction": "out",
+          "text": "Great. Which city and neighbourhood do you live in?"
+        },
+        {
+          "direction": "in",
+          "text": "Mexico City, in Roma Norte"
+        },
+        {
+          "direction": "out",
+          "text": "What availability and shift would you like?"
+        },
+        {
+          "direction": "in",
+          "text": "Part-time, mornings"
+        },
+        {
+          "direction": "out",
+          "text": "Sazón Ciudad de México Roma is 3 minutes away by motorbike and has morning openings. Does it work for you?"
+        },
+        {
+          "direction": "in",
+          "text": "Yes, Roma is perfect"
+        },
+        {
+          "direction": "out",
+          "text": "When could you start?"
+        },
+        {
+          "direction": "in",
+          "text": "I can start on November 16"
+        },
+        {
+          "direction": "out",
+          "text": "Summary: motorcycle licence, Roma Norte, part-time mornings, Sazón Roma from 16 November. Correct?"
+        },
+        {
+          "direction": "in",
+          "text": "Correct"
+        },
+        {
+          "direction": "out",
+          "text": "You fit the role. I have Friday at 10:00 or Monday at 12:00 with the manager. Which one?"
+        },
+        {
+          "direction": "in",
+          "text": "Monday at 12:00 please"
+        },
+        {
+          "direction": "out",
+          "text": "Booked: 15-minute interview on Monday at 12:00 at Sazón Ciudad de México Roma. See you!"
+        }
+      ],
+      "fields": {
+        "nombre_completo": {
+          "value": "Emily Carter",
+          "evidence": "Hi! I'm Emily Carter, sorry, my Spanish isn't great",
+          "confidence": "high"
+        },
+        "carnet": {
+          "value": true,
+          "evidence": "Yes, I have a Mexican motorcycle licence",
+          "confidence": "high"
+        },
+        "tipo_carnet": {
+          "value": "Licencia de motociclista (México)",
+          "evidence": "Yes, I have a Mexican motorcycle licence",
+          "confidence": "medium"
+        },
+        "ciudad": {
+          "value": "Ciudad de México",
+          "evidence": "Mexico City, in Roma Norte",
+          "confidence": "high"
+        },
+        "zona": {
+          "value": "Roma Norte",
+          "evidence": "Mexico City, in Roma Norte",
+          "confidence": "high"
+        },
+        "local_asignado": {
+          "value": "Sazón Ciudad de México Roma",
+          "evidence": "Yes, Roma is perfect",
+          "confidence": "high"
+        },
+        "disponibilidad": {
+          "value": "media jornada",
+          "evidence": "Part-time, mornings",
+          "confidence": "high"
+        },
+        "turno": {
+          "value": "mañana",
+          "evidence": "Part-time, mornings",
+          "confidence": "high"
+        },
+        "incorporacion": {
+          "value": "2026-11-16",
+          "evidence": "I can start on November 16",
+          "confidence": "high"
+        }
+      },
+      "summary": "Apta (conversación en inglés): licencia de moto mexicana, Roma Norte, media jornada de mañana. Sazón Roma desde el 16/11; entrevista el lunes a las 12:00.",
+      "verdict": "qualified",
+      "decision": "proposed",
+      "interview": {
+        "site_id": "MEX-2",
+        "weekday": 0,
+        "time": "12:00"
+      }
+    },
+    {
+      "key": "carmen",
+      "name": "Carmen Ibáñez Gómez",
+      "phone": "+34000000206",
+      "offer": "repartidores",
+      "status": "handed_off",
+      "hours_ago": 3,
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Carmen Ibáñez Gómez"
+        },
+        {
+          "direction": "out",
+          "text": "¿Tienes carnet de conducir en vigor?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, el B. Pero antes dime cuánto se cobra por hora"
+        },
+        {
+          "direction": "out",
+          "text": "El encargado te detalla el sueldo y los pluses en la entrevista. ¿En qué ciudad vives?"
+        },
+        {
+          "direction": "in",
+          "text": "No sigo sin saber el sueldo exacto, quiero hablar con alguien de verdad"
+        },
+        {
+          "direction": "out",
+          "text": "De acuerdo, te paso con una persona del equipo de selección. Te escribirán por aquí."
+        }
+      ],
+      "fields": {
+        "nombre_completo": {
+          "value": "Carmen Ibáñez Gómez",
+          "evidence": "Carmen Ibáñez Gómez",
+          "confidence": "high"
+        },
+        "carnet": {
+          "value": true,
+          "evidence": "Sí, el B. Pero antes dime cuánto se cobra por hora",
+          "confidence": "high"
+        }
+      },
+      "summary": "Pide el sueldo exacto e insiste tras la explicación; solicita una persona.",
+      "handoff_reason": "Insiste en conocer el sueldo exacto antes de continuar"
+    },
+    {
+      "key": "pedro",
+      "name": "Pedro Lozano Martí",
+      "phone": "+34000000207",
+      "offer": "repartidores",
+      "status": "abandoned",
+      "hours_ago": 80,
+      "city": "Castellón",
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Pedro Lozano Martí"
+        },
+        {
+          "direction": "out",
+          "text": "¿Tienes carnet de conducir en vigor?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, B"
+        },
+        {
+          "direction": "out",
+          "text": "¿En qué ciudad y zona vives?"
+        },
+        {
+          "direction": "in",
+          "text": "Castellón, en el Grau"
+        },
+        {
+          "direction": "out",
+          "text": "¿Qué disponibilidad tienes: completa, media jornada o fines de semana?"
+        },
+        {
+          "direction": "out",
+          "text": "Hola, Pedro. Cuando puedas, dime qué disponibilidad tienes y seguimos."
+        },
+        {
+          "direction": "out",
+          "text": "Buenos días, Pedro. Cuando puedas, dime tu disponibilidad y el turno que prefieres."
+        },
+        {
+          "direction": "out",
+          "text": "Último aviso, Pedro: si te sigue interesando, contesta cuando quieras."
+        }
+      ],
+      "abandoned_stage": "disponibilidad"
+    },
+    {
+      "key": "raul",
+      "name": "Raúl Moreno Vidal",
+      "phone": "+34000000208",
+      "offer": "repartidores",
+      "status": "active",
+      "hours_ago": 1,
+      "city": "Madrid",
+      "language": "es",
+      "messages": [
+        {
+          "direction": "out",
+          "text": "Hola, soy Sofía, la asistente virtual de Grupo Sazón. Te haré unas preguntas cortas para la oferta de repartidor/a. ¿Cómo te llamas?"
+        },
+        {
+          "direction": "in",
+          "text": "Raúl Moreno Vidal"
+        },
+        {
+          "direction": "out",
+          "text": "¿Tienes carnet de conducir en vigor?"
+        },
+        {
+          "direction": "in",
+          "text": "Sí, tengo el A2"
+        },
+        {
+          "direction": "out",
+          "text": "¿En qué ciudad y zona vives?"
+        },
+        {
+          "direction": "in",
+          "text": "En Madrid, Lavapiés"
+        },
+        {
+          "direction": "out",
+          "text": "¿Qué turno prefieres: mañana, tarde, noche o flexible?"
+        }
+      ]
+    },
+    {
+      "key": "nerea",
+      "name": "Nerea Campos Soler",
+      "phone": "+34000000209",
+      "offer": "repartidores",
+      "status": "awaiting",
+      "hours_ago": 2
+    }
+  ]
+}

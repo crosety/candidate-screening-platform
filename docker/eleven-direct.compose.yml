@@ -1,0 +1,17 @@
+# Private local synthetic voice; no callback or public tunnel is exposed.
+services:
+  api:
+    environment:
+      ELEVEN_DIRECT_AGENTS_FILE: /run/voice/agents.json
+      ELEVEN_DIRECT_DAILY_LIMIT: "20"
+      ELEVENLABS_API_KEY_FILE: /run/secrets/elevenlabs_api_key
+    secrets: [elevenlabs_api_key]
+    volumes:
+      - ./.runtime-secrets/direct:/run/voice:ro
+  worker:
+    environment:
+      ELEVENLABS_API_KEY_FILE: /run/secrets/elevenlabs_api_key
+    secrets: [elevenlabs_api_key]
+secrets:
+  elevenlabs_api_key:
+    file: ./.runtime-secrets/elevenlabs_api_key

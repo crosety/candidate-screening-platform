@@ -1,0 +1,52 @@
+import { test, expect } from "@playwright/test";
+import { login, selectTenant, createChat } from "./helpers";
+test("pedir una persona desactiva el chat automático", async ({ page }) => {
+  await login(page); await selectTenant(page, "Grupo Sazón");
+  const chat = await createChat(page, `Persona e2e ${Date.now()}`);
+  await chat.getByLabel("Tu mensaje").fill("persona");
+  await chat.getByRole("button", { name: "Enviar" }).click();
+  await expect(chat.getByText("Atención del equipo de selección", { exact: true })).toBeVisible();
+  await expect(chat.getByLabel("Tu mensaje")).toBeEnabled();
+  await chat.getByLabel("Tu mensaje").fill("Espero al equipo, gracias.");
+  await chat.getByRole("button", { name: "Enviar mensaje", exact: true }).click();
+  await expect(chat.getByText("Espero al equipo, gracias.", { exact: true })).toHaveCount(1);
+  await expect(chat.getByText("El asistente está escribiendo…", { exact: true })).toHaveCount(0);
+  const tenant = new URL(page.url()).pathname.split("/")[2];
+  const token = new URL(chat.url()).pathname.split("/").at(-1);
+  const session = await chat.evaluate(async token => {
+    const response = await fetch("/api/v1/chat/sessions", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token})});
+    return response.json();
+  }, token);
+  await login(page, "reclutadora@orbio.local");
+  await page.goto(`/t/${tenant}/candidaturas/${session.session_id}`);
+  await page.getByRole("tab", {name:/Conversación/}).click();
+  await page.getByRole("button", {name:"Tomar conversación", exact:true}).click();
+  await page.getByLabel("Mensaje de HR").fill("Hola, soy Marta. Estoy aquí para ayudarte.");
+  let lostResponse = false;
+  const messageIds: string[] = [];
+  await page.route(`**/sessions/${session.session_id}/human`, async route => {
+    const message = route.request().method() === "POST" && route.request().postDataJSON().action === "message";
+    if (message) messageIds.push(route.request().postDataJSON().message_id);
+    if (!lostResponse && message) {
+      lostResponse = true;
+      await route.fetch();
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await page.getByRole("button", {name:"Enviar mensaje al candidato", exact:true}).click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await page.getByRole("button", {name:"Enviar mensaje al candidato", exact:true}).click();
+  await expect(chat.getByText("Hola, soy Marta. Estoy aquí para ayudarte.", {exact:true})).toBeVisible();
+  await expect(chat.getByText("Hola, soy Marta. Estoy aquí para ayudarte.", {exact:true})).toHaveCount(1);
+  expect(messageIds).toHaveLength(2);
+  expect(messageIds[1]).toBe(messageIds[0]);
+  await chat.getByLabel("Tu mensaje").fill("Gracias Marta, podemos seguir.");
+  await chat.getByRole("button", {name:"Enviar mensaje", exact:true}).click();
+  await expect(page.getByText("Gracias Marta, podemos seguir.", {exact:true})).toBeVisible();
+  await page.getByRole("button", {name:"Devolver a la IA", exact:true}).click();
+  await expect(chat.getByText("Atención del equipo de selección", {exact:true})).toHaveCount(0);
+  await page.getByRole("button", {name:"Tomar conversación", exact:true}).click();
+  await page.getByRole("button", {name:"Cerrar conversación", exact:true}).click();
+  await expect(chat.getByText("Conversación completada", {exact:true}).first()).toBeVisible();
+  await expect(chat.getByLabel("Tu mensaje")).toHaveCount(0);
+});

@@ -1,0 +1,106 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg16-bookworm@sha256:00ba258a66dac104fd5171074a0084462a64a1369d8513f3d0a634e2f24d15bc
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine@sha256:892022f9f18c26c92c30e15194d132f90044af87b94a491a75429bbc3982eab1
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: { context: ., dockerfile: docker/python.Dockerfile }
+    command: sh -c "python manage.py migrate --noinput && uvicorn web.asgi:application --host 0.0.0.0 --port 8000 --no-access-log --log-level warning --reload --reload-dir src"
+    environment: &backend_environment
+      DATABASE_URL: postgres://screening:screening@postgres:5432/screening
+      REDIS_URL: redis://redis:6379/0
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Configure DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: "false"
+      INGEST_TOKEN: ${INGEST_TOKEN:?Configure INGEST_TOKEN}
+      SEED_PASSWORD: ${SEED_PASSWORD:-}
+      LLM_MODE: ${LLM_MODE:-fake}
+      LANGFUSE_ENABLED: ${LANGFUSE_ENABLED:-false}
+      LANGFUSE_PROJECT_ID: ${LANGFUSE_PROJECT_ID:-}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+      LANGFUSE_CONFIG_FILE: /run/secrets/langfuse
+      LANGFUSE_ENVIRONMENT: ${LANGFUSE_ENVIRONMENT:-local}
+      PUBLISH_REQUIRES_EVALS: ${PUBLISH_REQUIRES_EVALS:-true}
+      CHAT_BASE_URL: ${CHAT_BASE_URL:-http://localhost:5174}
+      META_SEND_ENABLED: ${META_SEND_ENABLED:-false}
+      GPT_LIVE_ENABLED: ${GPT_LIVE_ENABLED:-false}
+      GPT_LIVE_VOICE_ID: ${GPT_LIVE_VOICE_ID:-}
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - ./src:/app/src:ro
+      - ./seeds:/app/seeds:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 5s
+      retries: 30
+
+  worker:
+    build: { context: ., dockerfile: docker/python.Dockerfile }
+    command: python manage.py run_worker
+    environment: *backend_environment
+    secrets: [openai_api_key]
+    volumes:
+      - ./src:/app/src:ro
+      - ./seeds:/app/seeds:ro
+    depends_on:
+      api: { condition: service_healthy }
+
+  mcp-registro:
+    build: { context: ., dockerfile: docker/python.Dockerfile }
+    command: python services/mcp-registro/server.py
+    ports: ["127.0.0.1:8100:8100"]
+    volumes:
+      - ./services/mcp-registro:/app/services/mcp-registro:ro
+
+  console:
+    build: { context: ., dockerfile: docker/node.Dockerfile }
+    command: pnpm --filter console dev --host 0.0.0.0
+    environment:
+      API_TARGET: http://api:8000
+    ports: ["127.0.0.1:5173:5173"]
+    volumes:
+      - ./apps/console/src:/app/apps/console/src:ro
+      - ./packages/api-client/src:/app/packages/api-client/src:ro
+    depends_on:
+      api: { condition: service_healthy }
+
+  chat:
+    build: { context: ., dockerfile: docker/node.Dockerfile }
+    command: pnpm --filter chat dev --host 0.0.0.0
+    environment:
+      API_TARGET: http://api:8000
+    ports: ["127.0.0.1:5174:5174"]
+    volumes:
+      - ./apps/chat/src:/app/apps/chat/src:ro
+      - ./packages/api-client/src:/app/packages/api-client/src:ro
+    depends_on:
+      api: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  pgvector_data:
+
+secrets:
+  openai_api_key:
+    file: ${OPENAI_API_KEY_FILE:-./.runtime-secrets/openai_api_key}

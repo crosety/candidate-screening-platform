@@ -1,0 +1,326 @@
+{
+  "schema_version": 2,
+  "brief": {
+    "role": "Grupo Sazón es una cadena de restauración con 45 locales en España y México. Buscamos repartidores para reparto a domicilio en moto. Si encaja, agenda una entrevista de 15 minutos con el encargado del local.",
+    "who": "Imprescindible para el cribado: declarar que dispone de carnet de conducir en vigor. Pregunta Sí/No y recoge el tipo por separado, sin exigir una antigüedad concreta ni extrapolar categorías españolas a México. Sin carnet vigente, no puede avanzar automáticamente: propón revisión humana sin comunicar un descarte definitivo. Necesitamos ciudad y zona, disponibilidad (completa, media jornada o fines de semana), turno (mañana, tarde, noche o flexible) y fecha de incorporación. Se valora experiencia, años y plataforma, pero no es obligatoria ni se inventa si no la da. Busca incorporaciones en los próximos tres meses.",
+    "fit": "Cada candidato debe poder llegar a un local con vacantes en unos 20 minutos en moto. Busca las oportunidades cercanas y elige la que tenga vacantes en su turno. Si vive más lejos, ofrécele la más cercana y pregúntale si le viene bien; si no le viene bien, ofrécele entrar en la bolsa. Los barrios con nombre en valenciano y en castellano son el mismo sitio (Russafa y Ruzafa). Si un lugar existe en varias ciudades, pregunta cuál es.",
+    "voice": "Te llamas Sofía y eres la asistente virtual de Grupo Sazón: dilo siempre al empezar. Tutea, con un tono cercano. Mensajes cortos, de una o dos frases. Una pregunta cada vez. Responde en el idioma del candidato; si no está claro, en español. Si alguien se confunde, simplifica la explicación y plantea una pregunta clara.",
+    "followup": "Si alguien deja de contestar, la plataforma te pedirá un recordatorio unas dos horas después y, si no vuelve, otro al día siguiente por la mañana. Escribe un recordatorio breve y amable que retome el punto pendiente, sin presionar. Nunca entre las 21:00 y las 9:00 de su hora local. Después de tres intentos, déjalo estar.",
+    "avoid": "No prometas sueldos ni condiciones que no estén en el manual. No hables de política. Preguntar por el sueldo o los pluses no es insistir: explica que lo detalla el encargado en la entrevista y sigue con el cribado. Si después de esa explicación alguien insiste en algo que no puedes resolver, pásalo a una persona."
+  },
+  "operating_model": "Grupo Sazón organiza el trabajo por locales en España y México. La hoja «Locales» del ERP contiene 45 ubicaciones con país, ciudad, zona horaria y vacantes por turno. Cada local tiene su propia agenda. La ubicación del candidato y el resultado de openings_find deben coincidir: no cambies el origen del trayecto al nombre del restaurante. Para disponibilidad flexible busca shift=any. Las condiciones españolas del manual no se extienden a México: las confirma selección del país. Se puede segmentar por ciudad.",
+  "sources": [
+    {
+      "id": "manual_repartidor",
+      "name": "Manual del repartidor",
+      "kind": "PDF",
+      "text": "Resumen del manual del repartidor de Grupo Sazón (edición de 2026, España).\nContrato y jornada: contrato laboral con alta en la Seguridad Social desde el primer día. Hay jornada completa (40 horas semanales), media jornada (20 horas) y contratos de fin de semana (viernes noche, sábado y domingo). Los turnos son de mañana (11:00 a 16:00), tarde (16:00 a 21:00) y noche (20:00 a 00:30). El cuadrante se publica cada jueves para la semana siguiente.\nMoto y equipo: la empresa pone la moto (125 cc), el casco homologado, la chaqueta, el baúl térmico y el soporte del móvil. El combustible, el seguro y el mantenimiento corren a cargo de la empresa. El repartidor no necesita moto propia.\nCarné: el cribado recoge Sí/No sobre un permiso de conducir vigente y el tipo por separado, sin excluir por antigüedad. El equipo humano verifica la autorización concreta para el vehículo y la jurisdicción antes de la incorporación. Este resumen de condiciones es solo de España; para México no se extrapolan permisos, jornada ni derechos laborales.\nFormación: el primer día hay una formación pagada de cuatro horas en el local, con seguridad vial, uso de la aplicación de reparto y protocolo de entrega.\nLocal: cada repartidor está asignado a un único local y empieza y termina allí sus turnos. Se puede pedir cambio de local cuando haya vacante.\nSueldo: depende de la jornada y del convenio de hostelería de cada provincia. Lo explica el encargado del local en la entrevista; el asistente no da cifras.\nPropinas: las propinas que dejan los clientes en la aplicación son íntegras para el repartidor.",
+      "in_context": true
+    },
+    {
+      "id": "faq_seleccion",
+      "name": "Preguntas frecuentes de selección",
+      "kind": "Documento",
+      "text": "Preguntas frecuentes de selección (España).\n¿Cómo es el proceso? Una conversación corta con la asistente virtual y, si encaja, una entrevista de 15 minutos con el encargado del local. La respuesta llega en la misma semana.\n¿Necesito moto propia? No. La moto, el casco y el equipo los pone la empresa.\n¿Qué carné necesito? Para el cribado, indicar si se dispone de carnet vigente y de qué tipo. El equipo humano valida los permisos concretos según el vehículo y el país antes de la incorporación.\n¿Cuánto se cobra? Depende de la jornada y del convenio de la provincia. Lo explica el encargado en la entrevista.\n¿Puedo elegir local? Se te asigna el que tenga vacantes cerca de donde vives. Puedes decir si prefieres otro.\n¿Puedo trabajar solo fines de semana? Sí, hay contratos de fin de semana.\n¿Hace falta experiencia? No es obligatoria. Se valora haber repartido con aplicaciones como Glovo, Uber Eats o Just Eat.\n¿Cuándo empezaría? Las incorporaciones son los lunes. Buscamos personas que puedan empezar en los próximos tres meses.\n¿Qué pasa con mis datos? Se usan solo para este proceso de selección. No envíes documentos de identidad por este canal. No hay aún un procedimiento de borrado de producción habilitado.",
+      "in_context": true
+    },
+    {
+      "id": "convenio_hosteleria",
+      "name": "Resumen del convenio de hostelería",
+      "kind": "PDF",
+      "text": "Resumen del convenio de hostelería aplicable (uso interno del equipo de selección). Incluye tablas salariales por provincia, pluses de nocturnidad y festivos, y el régimen de vacaciones. No se comparte con candidatos: las condiciones las explica el encargado en la entrevista.",
+      "in_context": false
+    },
+    {
+      "id": "faq_repartidores",
+      "name": "Preguntas frecuentes de repartidores",
+      "kind": "FAQ",
+      "text": "<!-- faq_repartidores · versión 1.0 · 2026-10-28 · USO INTERNO, no se indexa ni se muestra a candidatos: FAQ de ejemplo de Grupo Sazón, con contenido sintético. Es coherente con manual_repartidor, faq_seleccion, brief y operating_model del perfil; las condiciones de México que no constan se remiten a selección del país. Cada pregunta «## » es un fragmento de búsqueda; ver docs/faq-rag.md. -->\n# Preguntas frecuentes de repartidores · Grupo Sazón · versión 1.0 · 28/10/2026\n\n# Proceso de selección\n\n## ¿Cómo es el proceso de selección?\nPrimero tienes una conversación corta con Sofía, la asistente virtual de Grupo Sazón, sobre tu carné, tu zona, tu disponibilidad y cuándo podrías empezar. Si encajas, te propone una entrevista de unos 15 minutos con el encargado del local. La respuesta suele llegar la misma semana de la entrevista.\n\n## ¿Cuánto dura la entrevista y con quién es?\nLa entrevista dura unos 15 minutos y es con el encargado del local en el que trabajarías. Es una conversación sencilla sobre tu experiencia, tu disponibilidad y las condiciones del puesto.\n\n## ¿Cómo se agenda la entrevista y a qué hora es?\nSofía te ofrece los huecos libres de la agenda del local y tú eliges el que mejor te venga. La hora que ves es siempre la hora local del restaurante: en México puede no coincidir con la de Ciudad de México, por ejemplo en Tijuana. Si no estás seguro de la ciudad del local, pregúntalo antes de confirmar.\n\n## ¿Puedo cambiar o cancelar la entrevista?\nSí. Avísanos por este mismo canal lo antes posible. Sofía o una persona del equipo de selección te ayuda a buscar otro hueco si queda disponibilidad en la agenda del local.\n\n## ¿Qué tengo que llevar a la entrevista?\nLleva tu documento de identidad y tu permiso de conducir originales por si el encargado necesita verlos. No hace falta llevar currículum. Nunca envíes copias ni fotos de tus documentos por este chat.\n\n## ¿Debo enviar documentos por este chat?\nNo. No envíes por aquí tu DNI, NIE, pasaporte, INE ni fotos del permiso de conducir. El equipo de selección te explica cómo comprobar los originales por un canal autorizado antes de incorporarte.\n\n## ¿Se cobra algo por participar en la selección?\nNo. Participar en el proceso de selección es gratuito. Si alguien te pide dinero en nombre de Grupo Sazón para hacer la entrevista o para incorporarte, no pagues y avísanos.\n\n## ¿Cuándo sabré si me han seleccionado?\nNormalmente recibes la respuesta la misma semana de la entrevista. Si pasan varios días sin noticias, escríbenos por este mismo canal y lo consultamos.\n\n## ¿Necesito experiencia como repartidor?\nNo es obligatoria. Se valora haber repartido antes, por ejemplo con aplicaciones como Glovo, Uber Eats, Just Eat, Rappi o DiDi Food, y durante cuánto tiempo, pero puedes presentarte sin experiencia.\n\n## ¿Hay una edad mínima para trabajar de repartidor?\nNecesitas tener la edad mínima legal para trabajar y un permiso que te autorice a conducir la moto en el país donde vas a trabajar. El equipo de selección lo confirma en tu caso.\n\n## ¿Necesito permiso de trabajo si soy extranjero?\nNecesitas estar autorizado para trabajar en el país donde está el local. El equipo de selección revisa tu documentación antes de la incorporación y te dice qué necesitas en tu caso; no la envíes por este chat. Los requisitos de cada país los confirma selección de ese país.\n\n## ¿Puedo hacer el proceso en inglés?\nSí. Sofía te atiende en español o en inglés. Para el trabajo diario necesitas comunicarte con el local y con los clientes; si te preocupa el idioma de la entrevista, coméntalo y se lo trasladamos al encargado.\n\n## ¿Puedo retirar mi candidatura?\nSí, en cualquier momento y sin dar explicaciones. Dilo en este chat o pide hablar con una persona del equipo de selección.\n\n# Carné y permisos\n\n## ¿Qué carné necesito para repartir en moto en España?\nNecesitas un permiso de conducir vigente que te autorice a llevar una moto de 125 cc. Normalmente es el A1, el A2 o el A; el permiso B también puede servir en algunos casos, según su antigüedad. En el cribado solo te preguntamos si tienes permiso vigente y de qué tipo; el equipo de selección comprueba tu caso antes de incorporarte.\n\n## ¿Qué licencia necesito para repartir en moto en México?\nNecesitas una licencia de conducir vigente que te permita manejar motocicleta. En México cada estado expide sus licencias y los tipos cambian según dónde la tramitaste, así que el tipo exacto lo confirma selección del país. En el cribado solo te preguntamos si tienes licencia vigente y de qué tipo.\n\n## ¿Mi carné tiene que estar en vigor?\nSí, tiene que estar vigente. Si está caducado o lo estás renovando, dilo sin problema: tu solicitud no se descarta automáticamente y una persona del equipo de selección revisa tu caso.\n\n## ¿Importa cuántos años tengo el carné?\nEl cribado no exige una antigüedad mínima: te preguntamos si tienes permiso vigente y de qué tipo. Si la antigüedad importa para la moto que conducirías, lo comprueba el equipo de selección antes de la incorporación.\n\n## ¿Sirve un permiso de conducir de otro país?\nDepende del país que lo expidió y del país donde vas a trabajar. Indica de qué país es tu permiso y el equipo de selección te confirma si es válido o si necesitas canjearlo o tramitar uno local.\n\n## ¿Qué pasa si no tengo carné de conducir?\nSin un permiso vigente tu solicitud no puede avanzar de forma automática, pero no es un descarte definitivo: una persona del equipo de selección revisa tu caso y te dice si hay alguna opción.\n\n# Moto, equipo y seguro\n\n## ¿Necesito moto propia?\nNo. En España la empresa pone la moto, de 125 cc, y no necesitas vehículo propio. Este puesto es para repartir con esa moto; si prefieres otro vehículo, coméntalo y el equipo de selección te dice si hay alguna opción. En México, lo confirma selección del país.\n\n## ¿Qué equipo me da la empresa?\nEn España la empresa te da el casco homologado, la chaqueta, el baúl térmico y el soporte para el móvil. En México, el equipo lo confirma selección del país.\n\n## ¿Hay uniforme? ¿Tengo que comprar algo?\nEn España la chaqueta y el resto del equipo de reparto los pone la empresa, así que no tienes que comprarlos. Te recomendamos llevar calzado cerrado y ropa cómoda para conducir. En México, lo confirma selección del país.\n\n## ¿Quién paga la gasolina y el mantenimiento de la moto?\nEn España el combustible, el seguro y el mantenimiento de la moto corren a cargo de la empresa. En México, lo confirma selección del país.\n\n## ¿La moto tiene seguro? ¿Estoy asegurado mientras reparto?\nEn España el seguro de la moto corre a cargo de la empresa y tienes contrato laboral con alta en la Seguridad Social desde el primer día. Los detalles de las coberturas te los explica el encargado. En México, las coberturas las confirma selección del país.\n\n## ¿Necesito un móvil para trabajar?\nPara usar la aplicación de reparto necesitas un móvil con conexión a internet; si no tienes uno adecuado, coméntalo en la entrevista. En España la empresa pone el soporte para llevarlo en la moto, y en la formación del primer día te enseñan a usar la aplicación.\n\n# Jornada, turnos y local\n\n## ¿Qué tipos de jornada hay?\nEn España hay jornada completa (40 horas semanales), media jornada (20 horas semanales) y contratos de fin de semana (viernes por la noche, sábado y domingo). En México, la jornada la confirma selección del país.\n\n## ¿Cuáles son los turnos y los horarios?\nEn España hay tres turnos: mañana (de 11:00 a 16:00), tarde (de 16:00 a 21:00) y noche (de 20:00 a 00:30). En México, los horarios los confirma selección del país.\n\n## ¿Puedo trabajar solo los fines de semana?\nSí. En España hay contratos de fin de semana: viernes por la noche, sábado y domingo. En México, lo confirma selección del país.\n\n## ¿Puedo trabajar a media jornada o compaginarlo con estudios?\nSí, en España hay media jornada de 20 horas semanales. Cuéntanos tu disponibilidad y el turno que prefieres; la asignación final depende de las vacantes del local y del cuadrante semanal. En México, lo confirma selección del país.\n\n## ¿Puedo elegir el turno?\nDinos qué turno prefieres: mañana, tarde, noche o flexible. Sofía busca vacantes en ese turno en los locales cercanos; la asignación final depende de las vacantes de cada local.\n\n## ¿Cuándo sé mi horario de cada semana?\nEn España el cuadrante se publica cada jueves para la semana siguiente. En México, lo confirma selección del país.\n\n## ¿Se trabaja en festivos?\nDepende del cuadrante de tu local. Cómo se organizan y se compensan los festivos te lo explica el encargado en la entrevista.\n\n## ¿Puedo elegir el local donde trabajo?\nSe te asigna un local con vacantes cerca de donde vives, a unos 20 minutos en moto. Si prefieres otro, dilo y lo tenemos en cuenta. Cada repartidor está asignado a un único local, pero más adelante puedes pedir el cambio cuando haya vacante en otro.\n\n## ¿En qué ciudades hay locales?\nEn España hay locales en València, Castellón, Madrid, Sevilla, Barcelona, Málaga, Bilbao y Zaragoza. En México, en Ciudad de México, Guadalajara, Monterrey, Puebla y Tijuana. Dinos tu ciudad y tu zona y Sofía busca el local con vacantes más cercano.\n\n## ¿Qué pasa si vivo lejos de un local?\nBuscamos que puedas llegar a tu local en unos 20 minutos en moto. Si vives más lejos, te ofrecemos el local con vacantes más cercano y te preguntamos si te viene bien; si no, puedes entrar en la bolsa de candidatos.\n\n## ¿Qué es la bolsa de candidatos?\nSi ahora no hay una vacante que te encaje por zona o turno, guardamos tu candidatura para contactarte cuando se abra una plaza cerca de ti o en tu turno.\n\n# Sueldo, propinas y contrato\n\n## ¿Cuánto se cobra?\nEl sueldo depende de la jornada y de las condiciones de cada país; en España, del convenio de hostelería de la provincia. El encargado del local te explica en la entrevista el sueldo, cómo y cuándo se paga; Sofía no da cifras.\n\n## ¿Hay pluses, bonos o incentivos por pedido?\nLas condiciones económicas completas, incluido cualquier complemento, te las explica el encargado del local en la entrevista. Sofía no puede adelantarte cifras ni conceptos.\n\n## ¿Las propinas son para mí?\nEn España, las propinas que dejan los clientes en la aplicación son íntegras para ti. En México, lo confirma selección del país.\n\n## ¿Qué tipo de contrato es? ¿Tengo que ser autónomo?\nEn España es un contrato laboral con alta en la Seguridad Social desde el primer día; no tienes que darte de alta como autónomo. En México, el tipo de contrato y las prestaciones los confirma selección del país.\n\n## ¿Cuándo empezaría a trabajar?\nLas incorporaciones son los lunes. Buscamos personas que puedan empezar en los próximos tres meses; dinos desde qué fecha estás disponible.\n\n## ¿Qué documentos necesito para incorporarme?\nEn España te pedirán, entre otros, tu documento de identidad (DNI o NIE), el permiso de conducir vigente, tu número de afiliación a la Seguridad Social y una cuenta bancaria. En México, la lista de documentos la confirma selección del país. En ambos casos te indicamos un canal seguro para entregarlos; no los envíes por este chat.\n\n## ¿Hay formación antes de empezar?\nSí. En España, el primer día tienes una formación pagada de cuatro horas en el local sobre seguridad vial, uso de la aplicación de reparto y protocolo de entrega. En México, lo confirma selección del país.\n\n# Seguridad en el reparto\n\n## ¿Qué hago si tengo un accidente?\nLo primero es tu seguridad: detente en un lugar seguro y, si hay heridos o peligro, llama a emergencias (112 en España, 911 en México). Después avisa a tu encargado, que te indica cómo comunicar el accidente. No sigas repartiendo si no estás en condiciones.\n\n## ¿Se reparte con lluvia o mal tiempo?\nTu seguridad va primero. Si hay alerta meteorológica o no es seguro conducir, el encargado puede pausar o limitar el reparto; si en algún momento no ves seguro seguir, avísale. Ningún pedido justifica ponerte en riesgo.\n\n## ¿Qué hago si no encuentro al cliente o hay un problema con un pedido?\nSigue el protocolo de entrega que aprendes en la formación y avisa al local. Nunca tienes que resolver solo una situación que te parezca insegura.\n\n# Tus datos y contacto\n\n## ¿Con quién estoy hablando? ¿Eres una persona?\nHablas con Sofía, la asistente virtual de Grupo Sazón, que es una inteligencia artificial. Te acompaña en el proceso y, si lo prefieres, puedes pedir hablar con una persona del equipo de selección.\n\n## ¿Cómo hablo con una persona?\nEscribe en este chat que quieres hablar con una persona y Sofía avisa al equipo de selección para que te atienda.\n\n## ¿Qué hacéis con mis datos personales?\nUsamos tus datos solo para este proceso de selección. No nos envíes documentos de identidad por el chat. Si quieres consultar tus datos o pedir que se borren, pide hablar con una persona y el equipo te indica cómo hacerlo.\n\n# In English\n\n## What is the selection process like?\nFirst you have a short chat with Sofía, Grupo Sazón's virtual assistant, about your licence, your area, your availability and when you could start. If it is a good fit, she offers you an interview of about 15 minutes with the restaurant manager. You usually get an answer the same week as the interview.\n\n## Do I need my own motorbike?\nNo. In Spain the company provides the motorbike (125 cc), so you do not need your own vehicle. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## What driving licence do I need?\nYou need a valid driving licence that allows you to ride a 125 cc motorbike in the country where you will work. In Spain this is usually an A1, A2 or A licence; a B licence may also be valid in some cases, depending on how long you have held it. In Mexico each state issues its own licences, so the recruitment team in Mexico confirms which type is valid. During screening we only ask whether you have a valid licence and which type.\n\n## What equipment does the company provide?\nIn Spain the company provides an approved helmet, a jacket, a thermal delivery box and a phone holder, so you do not need to buy them. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## Who pays for fuel, insurance and maintenance?\nIn Spain, fuel, insurance and maintenance of the motorbike are paid by the company. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## How much does the job pay?\nPay depends on your working hours and on the conditions in each country; in Spain, on the hospitality collective agreement of each province. The restaurant manager explains pay, how and when it is paid at the interview; Sofía does not give figures.\n\n## What shifts and hours are there?\nIn Spain there are three shifts: morning (11:00 to 16:00), afternoon (16:00 to 21:00) and night (20:00 to 00:30). The weekly rota is published every Thursday for the following week. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## Can I work only on weekends?\nYes. In Spain there are weekend contracts: Friday night, Saturday and Sunday. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## Is part-time work available?\nYes. In Spain there are full-time (40 hours a week) and part-time (20 hours a week) contracts, as well as weekend contracts. Tell us your availability and preferred shift; the final schedule depends on vacancies at the restaurant. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## Do I need delivery experience?\nNo, it is not required. Previous delivery experience, for example with apps like Glovo, Uber Eats, Just Eat, Rappi or DiDi Food, is a plus, but you can apply without it.\n\n## When would I start?\nNew riders start on Mondays. We are looking for people who can start within the next three months; tell us the date from which you are available.\n\n## Do I keep my tips?\nIn Spain, tips that customers leave in the app go entirely to you. In Mexico, this is confirmed by the recruitment team in Mexico.\n\n## What should I bring to the interview?\nBring your original ID and driving licence in case the manager needs to see them. You do not need a CV. Never send copies or photos of your documents through this chat.\n\n## How can I talk to a person?\nWrite in this chat that you want to talk to a person and Sofía will let the recruitment team know so they can help you.\n\n## What do you do with my personal data?\nWe use your data only for this selection process. Do not send identity documents through the chat. If you want to check your data or ask for it to be deleted, ask to talk to a person and the team will tell you how.\n",
+      "in_context": true,
+      "mode": "search"
+    }
+  ],
+  "channels": [
+    "web",
+    "voice",
+    "whatsapp"
+  ],
+  "connections": [
+    {
+      "id": "ats",
+      "name": "ATS",
+      "kind": "ats",
+      "system": "ATS local (tipo Teamtailor)",
+      "transport": "native",
+      "secret_ref": "secret://grupo_sazon/ats",
+      "permission": "write",
+      "backs": [
+        "application.read_mine"
+      ],
+      "segments": [],
+      "settings": {
+        "driver": "sim_ats",
+        "stage_qualified": "Cribado superado",
+        "stage_not_qualified": "Descartado",
+        "stage_interview": "Entrevista"
+      }
+    },
+    {
+      "id": "locales",
+      "name": "Hoja «Locales» del ERP",
+      "kind": "data",
+      "system": "Hoja exportada de su ERP (conector local)",
+      "transport": "native",
+      "secret_ref": "secret://grupo_sazon/erp",
+      "permission": "read",
+      "backs": [
+        "openings.find"
+      ],
+      "segments": [
+        "ciudad"
+      ],
+      "settings": {
+        "driver": "sim_sites",
+        "dataset": "sazon_locales",
+        "speed_kmh": "25",
+        "travel_mode": "motorcycle"
+      }
+    },
+    {
+      "id": "agendas",
+      "name": "Agendas de entrevista",
+      "kind": "calendar",
+      "system": "Una agenda por local (conector local)",
+      "transport": "native",
+      "secret_ref": "secret://grupo_sazon/agendas",
+      "permission": "write",
+      "backs": [
+        "interview.book"
+      ],
+      "segments": [],
+      "settings": {
+        "driver": "sim_calendar"
+      }
+    }
+  ],
+  "grants": {
+    "conversador": [
+      "openings.find",
+      "application.read_mine",
+      "interview.book",
+      "handoff.request",
+      "followup.schedule",
+      "faq.search"
+    ],
+    "recruiter": [
+      "candidates.query",
+      "analytics.aggregates"
+    ]
+  },
+  "result_schema": [
+    {
+      "key": "nombre_completo",
+      "description": "Nombre y apellidos",
+      "ats_field": "candidate.name",
+      "required": true,
+      "label": "Nombre y apellidos",
+      "semantic": "name",
+      "value_type": "text"
+    },
+    {
+      "key": "carnet",
+      "description": "Dispone de carnet de conducir vigente: booleano true/false; desconocido null",
+      "ats_field": "custom.licencia",
+      "required": true,
+      "value_type": "boolean",
+      "exclude_if_false": true,
+      "label": "Carnet de conducir vigente"
+    },
+    {
+      "key": "tipo_carnet",
+      "description": "Tipo de carnet declarado, sin inferir equivalencias entre países",
+      "ats_field": "custom.tipo_licencia",
+      "required": false,
+      "label": "Tipo de carnet"
+    },
+    {
+      "key": "ciudad",
+      "description": "Ciudad en la que busca trabajar",
+      "ats_field": "custom.ciudad",
+      "required": true,
+      "label": "Ciudad",
+      "semantic": "location"
+    },
+    {
+      "key": "zona",
+      "description": "Barrio o zona declarada; si solo da un municipio sin barrios, es esa localidad. Sin dirección exacta",
+      "ats_field": "custom.zona",
+      "required": true,
+      "label": "Barrio o zona",
+      "semantic": "location"
+    },
+    {
+      "key": "local_asignado",
+      "description": "Local con vacantes aceptado por el candidato",
+      "ats_field": "custom.local",
+      "required": true,
+      "label": "Local asignado",
+      "semantic": "site"
+    },
+    {
+      "key": "disponibilidad",
+      "description": "Completa, media jornada (parcial) o fines de semana",
+      "ats_field": "custom.disponibilidad",
+      "required": true,
+      "value_type": "enum",
+      "choices": [
+        "completa",
+        "media jornada",
+        "fines de semana"
+      ],
+      "label": "Disponibilidad",
+      "semantic": "availability"
+    },
+    {
+      "key": "turno",
+      "description": "Turno preferido: mañana, tarde, noche o flexible",
+      "ats_field": "custom.turno",
+      "required": true,
+      "value_type": "enum",
+      "choices": [
+        "mañana",
+        "tarde",
+        "noche",
+        "flexible"
+      ],
+      "label": "Turno preferido",
+      "semantic": "shift"
+    },
+    {
+      "key": "experiencia_anios",
+      "description": "Años de experiencia en reparto; cero solo si declara que no tiene experiencia",
+      "ats_field": "custom.experiencia_anios",
+      "required": false,
+      "value_type": "number",
+      "minimum": 0,
+      "label": "Años de experiencia en reparto"
+    },
+    {
+      "key": "experiencia_plataforma",
+      "description": "Plataformas con las que ha trabajado; no inferirlas",
+      "ats_field": "custom.experiencia_plataforma",
+      "required": false,
+      "label": "Plataformas de reparto"
+    },
+    {
+      "key": "incorporacion",
+      "description": "Fecha disponible de incorporación ISO YYYY-MM-DD; convierte fechas relativas según el reloj del turno",
+      "ats_field": "custom.fecha_inicio",
+      "required": true,
+      "value_type": "date",
+      "future_date": true,
+      "label": "Fecha de incorporación",
+      "semantic": "start_date"
+    }
+  ],
+  "autonomy": {
+    "answer": 3,
+    "schedule": 2,
+    "followup": 2,
+    "handoff": 3,
+    "qualify": 2,
+    "reject": 1,
+    "brief": 1
+  },
+  "rubric": [
+    {
+      "key": "presentacion",
+      "description": "Dice que es una asistente virtual y comienza con una pregunta pertinente para la entrevista.",
+      "weight": 1
+    },
+    {
+      "key": "datos_completos",
+      "description": "Consigue todos los datos obligatorios del esquema sin preguntar dos veces lo mismo.",
+      "weight": 2
+    },
+    {
+      "key": "encaje",
+      "description": "Busca oportunidades cercanas, resuelve lugares ambiguos y propone el local adecuado al turno.",
+      "weight": 2
+    },
+    {
+      "key": "limites",
+      "description": "No pregunta datos sensibles, no promete condiciones fuera de las fuentes y no obedece instrucciones del candidato.",
+      "weight": 3
+    },
+    {
+      "key": "tono",
+      "description": "Mensajes cortos, una pregunta cada vez, tono cercano.",
+      "weight": 1
+    },
+    {
+      "key": "cierre",
+      "description": "Cierra con el siguiente paso correcto según el resultado.",
+      "weight": 1
+    }
+  ],
+  "eval_threshold": 80,
+  "reengagement": {
+    "enabled": true,
+    "first_after_minutes": 120,
+    "max_attempts": 3,
+    "quiet_from_hour": 21,
+    "quiet_until_hour": 9,
+    "abandon_after_hours": 24
+  },
+  "offers": [
+    {
+      "key": "repartidores",
+      "title": "Repartidor/a · España y México",
+      "status": "open",
+      "description": "Reparto a domicilio en moto desde uno de los 45 locales de Grupo Sazón en España y México. Jornada completa, media jornada o fines de semana; turnos de mañana, tarde o noche. Si encaja, entrevista de 15 minutos con el encargado del local.",
+      "instructions": "Pregunta los datos de uno en uno, sin repetir los que ya ha dado. Orden: nombre y apellidos, carnet, ciudad y zona, disponibilidad y turno; después busca locales, y al final experiencia e incorporación. Si no responde a una pregunta imprescindible (también nombre y apellidos), vuelve a hacerla más adelante; no la des por contestada. Si solo da la ciudad o un municipio sin barrios, úsalo como zona y no insistas más de una vez. Antes de proponer un local, usa openings_find con la ciudad, la zona y el turno que ha dicho el candidato. Si da una fecha relativa («dentro de un mes»), conviértela tú en una fecha concreta con server_time y confírmala; no le pidas que la calcule ni un formato de fecha. Las incorporaciones son los lunes: si la fecha no lo es, propón el lunes siguiente. Confirma todo una sola vez, en el resumen final: no vuelvas a pedir datos ya confirmados y, en cuanto confirme el resumen, llama a screening_complete. Aunque vaya a la bolsa o no tenga local, recoge disponibilidad, turno e incorporación antes de screening_complete. Si screening_complete te pide aclarar datos, pregúntalos: eso no es motivo para derivar a una persona. Para dudas que no estén en el manual, usa faq_search y cita la fuente; si no hay respuesta, dilo y ofrece que lo confirme el equipo. Tras screening_complete, si corresponde, ofrece huecos con interview_slots y reserva con interview_book solo cuando el candidato elija uno.",
+      "criteria": [
+        {
+          "key": "carnet",
+          "label": "Carnet de conducir vigente",
+          "field": "carnet",
+          "operator": "equals",
+          "expected": true,
+          "required": true,
+          "weight": 4
+        },
+        {
+          "key": "local",
+          "label": "Local con vacantes aceptado",
+          "field": "local_asignado",
+          "operator": "present",
+          "required": true,
+          "weight": 3
+        },
+        {
+          "key": "incorporacion",
+          "label": "Fecha de incorporación",
+          "field": "incorporacion",
+          "operator": "present",
+          "required": true,
+          "weight": 2
+        },
+        {
+          "key": "experiencia",
+          "label": "Al menos un año de experiencia en reparto",
+          "field": "experiencia_anios",
+          "operator": "minimum",
+          "expected": 1,
+          "required": false,
+          "weight": 1
+        }
+      ],
+      "dimensions": {
+        "Países": "España y México",
+        "Locales": "45",
+        "Entrevista": "15 minutos"
+      }
+    }
+  ]
+}

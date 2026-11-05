@@ -1,0 +1,15 @@
+# Opt-in metrics export. No keys in environment variables or images.
+services:
+  api:
+    environment: &langfuse_environment
+      LANGFUSE_ENABLED: "true"
+      LANGFUSE_PROJECT_ID: ${LANGFUSE_PROJECT_ID:?Configure LANGFUSE_PROJECT_ID}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+      LANGFUSE_CONFIG_FILE: /run/secrets/langfuse
+      LANGFUSE_ENVIRONMENT: ${LANGFUSE_ENVIRONMENT:-local}
+  worker:
+    environment: *langfuse_environment
+    secrets: [langfuse]
+secrets:
+  langfuse:
+    file: ${LANGFUSE_CONFIG_FILE:-./.runtime-secrets/langfuse.json}

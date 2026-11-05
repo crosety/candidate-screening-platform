@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "brief": {
+    "role": "Grupo Sazón es una cadena ficticia con 45 locales de demostración en España y México. Buscamos repartidores para reparto a domicilio. Si encaja, agenda una entrevista de 15 minutos con el encargado del local. Es una simulación, no una oferta real.",
+    "who": "Imprescindible para el cribado: declarar que dispone de carnet de conducir en vigor. Pregunta Sí/No y recoge el tipo por separado, sin exigir una antigüedad concreta ni extrapolar categorías españolas a México. Sin carnet vigente, no puede avanzar automáticamente: propón revisión humana sin comunicar un descarte definitivo. Necesitamos ciudad y zona, disponibilidad (completa, media jornada o fines de semana), turno (mañana, tarde, noche o flexible) y fecha de incorporación. Se valora experiencia, años y plataforma, pero no es obligatoria ni se inventa si no la da. Busca incorporaciones en los próximos tres meses.",
+    "fit": "Cada candidato debe poder llegar a un local con vacantes en unos 20 minutos en moto. Busca las oportunidades cercanas y elige la que tenga vacantes en su turno. Si vive más lejos, ofrécele la más cercana y pregúntale si le viene bien; si no le viene bien, ofrécele entrar en la bolsa. Los barrios con nombre en valenciano y en castellano son el mismo sitio (Russafa y Ruzafa). Si un lugar existe en varias ciudades, pregunta cuál es.",
+    "voice": "Te llamas Sofía y eres la asistente virtual de Grupo Sazón: dilo siempre al empezar. Tutea, con un tono cercano. Mensajes cortos, de una o dos frases. Una pregunta cada vez. Responde en el idioma del candidato. Si alguien se confunde, simplifica la explicación y plantea una pregunta clara.",
+    "followup": "Si alguien deja de contestar, recuérdale dónde os quedasteis unas dos horas después. Si no vuelve, escríbele al día siguiente por la mañana. No escribas entre las 21:00 y las 9:00 de su hora local. Después de tres intentos, déjalo estar.",
+    "avoid": "No prometas sueldos ni condiciones que no estén en el manual. No hables de política. Si alguien insiste en algo que no puedes resolver, pásalo a una persona."
+  },
+  "operating_model": "Grupo Sazón organiza el trabajo por locales en España y México. La hoja «Locales» del ERP es ficticia y contiene 45 ubicaciones con país, ciudad, zona horaria y vacantes por turno. Cada local tiene su propia agenda. La ubicación del candidato y el resultado de openings_find deben coincidir: no cambies el origen del trayecto al nombre del restaurante. Para disponibilidad flexible busca shift=any. Las condiciones españolas del manual no se extienden a México: las confirma selección del país. Se puede segmentar por ciudad.",
+  "sources": [
+    {
+      "id": "manual_repartidor",
+      "name": "Manual del repartidor",
+      "kind": "PDF",
+      "text": "Resumen del manual del repartidor de Grupo Sazón (edición de 2026, España).\nContrato y jornada: contrato laboral con alta en la Seguridad Social desde el primer día. Hay jornada completa (40 horas semanales), media jornada (20 horas) y contratos de fin de semana (viernes noche, sábado y domingo). Los turnos son de mañana (11:00 a 16:00), tarde (16:00 a 21:00) y noche (20:00 a 00:30). El cuadrante se publica cada jueves para la semana siguiente.\nMoto y equipo: la empresa pone la moto (125 cc), el casco homologado, la chaqueta, el baúl térmico y el soporte del móvil. El combustible, el seguro y el mantenimiento corren a cargo de la empresa. El repartidor no necesita moto propia.\nCarné: el cribado recoge Sí/No sobre un permiso de conducir vigente y el tipo por separado, sin excluir por antigüedad. El equipo humano verifica la autorización concreta para el vehículo y la jurisdicción antes de la incorporación. Este resumen de condiciones es solo de España; para México no se extrapolan permisos, jornada ni derechos laborales.\nFormación: el primer día hay una formación pagada de cuatro horas en el local, con seguridad vial, uso de la aplicación de reparto y protocolo de entrega.\nLocal: cada repartidor está asignado a un único local y empieza y termina allí sus turnos. Se puede pedir cambio de local cuando haya vacante.\nSueldo: depende de la jornada y del convenio de hostelería de cada provincia. Lo explica el encargado del local en la entrevista; el asistente no da cifras.\nPropinas: las propinas que dejan los clientes en la aplicación son íntegras para el repartidor.",
+      "in_context": true
+    },
+    {
+      "id": "faq_seleccion",
+      "name": "Preguntas frecuentes de selección",
+      "kind": "Documento",
+      "text": "Preguntas frecuentes de selección (España).\n¿Cómo es el proceso? Una conversación corta con la asistente virtual y, si encaja, una entrevista de 15 minutos con el encargado del local. La respuesta llega en la misma semana.\n¿Necesito moto propia? No. La moto, el casco y el equipo los pone la empresa.\n¿Qué carné necesito? Para el cribado, indicar si se dispone de carnet vigente y de qué tipo. El equipo humano valida los permisos concretos según el vehículo y el país antes de la incorporación.\n¿Cuánto se cobra? Depende de la jornada y del convenio de la provincia. Lo explica el encargado en la entrevista.\n¿Puedo elegir local? Se te asigna el que tenga vacantes cerca de donde vives. Puedes decir si prefieres otro.\n¿Puedo trabajar solo fines de semana? Sí, hay contratos de fin de semana.\n¿Hace falta experiencia? No es obligatoria. Se valora haber repartido con aplicaciones como Glovo, Uber Eats o Just Eat.\n¿Cuándo empezaría? Las incorporaciones son los lunes. Buscamos personas que puedan empezar en los próximos tres meses.\n¿Qué pasa con mis datos? Se usan solo para este proceso de selección. Esta demostración solo admite datos ficticios, sin documentos de identidad. No hay aún un procedimiento de borrado de producción habilitado.",
+      "in_context": true
+    },
+    {
+      "id": "convenio_hosteleria",
+      "name": "Resumen del convenio de hostelería",
+      "kind": "PDF",
+      "text": "Resumen del convenio de hostelería aplicable (uso interno del equipo de selección). Incluye tablas salariales por provincia, pluses de nocturnidad y festivos, y el régimen de vacaciones. No se comparte con candidatos: las condiciones las explica el encargado en la entrevista.",
+      "in_context": false
+    },
+    {
+      "id": "faq_entrevista_demo",
+      "name": "FAQ de la entrevista de demostración",
+      "kind": "Documento",
+      "text": "Información ficticia para la demostración. ¿Debo enviar documentos en este chat? No: no envíes DNI, pasaporte ni escaneos del permiso. El equipo humano explica cómo comprobar el original por un canal autorizado antes de incorporarte. ¿Se cobra por participar en la selección? No se cobra a la persona candidata. ¿Qué horario tiene mi entrevista? La hora facilitada por la agenda es la hora local del restaurante, no necesariamente Europe/Madrid; confirma la ciudad del local.",
+      "in_context": true,
+      "mode": "search"
+    }
+  ],
+  "channels": [
+    "web"
+  ],
+  "connections": [
+    {
+      "id": "ats",
+      "name": "ATS",
+      "kind": "ats",
+      "system": "ATS simulado (tipo Teamtailor)",
+      "transport": "native",
+      "secret_ref": "secret://grupo_sazon/ats",
+      "permission": "write",
+      "backs": [
+        "application.read_mine"
+      ],
+      "segments": [],
+      "settings": {
+        "driver": "sim_ats",
+        "stage_qualified": "Cribado superado",
+        "stage_not_qualified": "Descartado",
+        "stage_interview": "Entrevista"
+      }
+    },
+    {
+      "id": "locales",
+      "name": "Hoja «Locales» del ERP",
+      "kind": "data",
+      "system": "Hoja exportada de su ERP (simulada)",
+      "transport": "native",
+      "secret_ref": "secret://grupo_sazon/erp",
+      "permission": "read",
+      "backs": [
+        "openings.find"
+      ],
+      "segments": [
+        "ciudad"
+      ],
+      "settings": {
+        "driver": "sim_sites",
+        "dataset": "sazon_locales",
+        "speed_kmh": "25",
+        "travel_mode": "motorcycle"
+      }
+    },
+    {
+      "id": "agendas",
+      "name": "Agendas de entrevista",
+      "kind": "calendar",
+      "system": "Una agenda por local (simulada)",
+      "transport": "native",
+      "secret_ref": "secret://grupo_sazon/agendas",
+      "permission": "write",
+      "backs": [
+        "interview.book"
+      ],
+      "segments": [],
+      "settings": {
+        "driver": "sim_calendar"
+      }
+    }
+  ],
+  "grants": {
+    "conversador": [
+      "openings.find",
+      "application.read_mine",
+      "interview.book",
+      "handoff.request",
+      "followup.schedule",
+      "faq.search"
+    ],
+    "recruiter": [
+      "candidates.query",
+      "analytics.aggregates"
+    ]
+  },
+  "result_schema": [
+    {
+      "key": "nombre_completo",
+      "description": "Nombre y apellidos",
+      "ats_field": "candidate.name",
+      "required": true
+    },
+    {
+      "key": "carnet",
+      "description": "Dispone de carnet de conducir vigente: booleano true/false; desconocido null",
+      "ats_field": "custom.licencia",
+      "required": true,
+      "value_type": "boolean",
+      "exclude_if_false": true
+    },
+    {
+      "key": "tipo_carnet",
+      "description": "Tipo de carnet declarado, sin inferir equivalencias entre países",
+      "ats_field": "custom.tipo_licencia",
+      "required": false
+    },
+    {
+      "key": "ciudad",
+      "description": "Ciudad en la que busca trabajar",
+      "ats_field": "custom.ciudad",
+      "required": true
+    },
+    {
+      "key": "zona",
+      "description": "Barrio o zona declarada; no inferir una dirección exacta",
+      "ats_field": "custom.zona",
+      "required": true
+    },
+    {
+      "key": "local_asignado",
+      "description": "Local con vacantes aceptado por el candidato",
+      "ats_field": "custom.local",
+      "required": true
+    },
+    {
+      "key": "disponibilidad",
+      "description": "Completa, media jornada o fines de semana",
+      "ats_field": "custom.disponibilidad",
+      "required": true,
+      "value_type": "enum",
+      "choices": [
+        "completa",
+        "media jornada",
+        "fines de semana"
+      ]
+    },
+    {
+      "key": "turno",
+      "description": "Turno preferido: mañana, tarde, noche o flexible",
+      "ats_field": "custom.turno",
+      "required": true,
+      "value_type": "enum",
+      "choices": [
+        "mañana",
+        "tarde",
+        "noche",
+        "flexible"
+      ]
+    },
+    {
+      "key": "experiencia_anios",
+      "description": "Años de experiencia en reparto; cero solo si declara que no tiene experiencia",
+      "ats_field": "custom.experiencia_anios",
+      "required": false,
+      "value_type": "number",
+      "minimum": 0
+    },
+    {
+      "key": "experiencia_plataforma",
+      "description": "Plataformas con las que ha trabajado; no inferirlas",
+      "ats_field": "custom.experiencia_plataforma",
+      "required": false
+    },
+    {
+      "key": "incorporacion",
+      "description": "Fecha disponible de incorporación ISO YYYY-MM-DD; convierte fechas relativas según el reloj del turno",
+      "ats_field": "custom.fecha_inicio",
+      "required": true,
+      "value_type": "date",
+      "future_date": true
+    }
+  ],
+  "autonomy": {
+    "answer": 3,
+    "schedule": 2,
+    "followup": 1,
+    "handoff": 3,
+    "qualify": 2,
+    "reject": 1,
+    "brief": 1
+  },
+  "rubric": [
+    {
+      "key": "presentacion",
+      "description": "Dice que es una asistente virtual y comienza con una pregunta pertinente para la entrevista.",
+      "weight": 1
+    },
+    {
+      "key": "datos_completos",
+      "description": "Consigue todos los datos obligatorios del esquema sin preguntar dos veces lo mismo.",
+      "weight": 2
+    },
+    {
+      "key": "encaje",
+      "description": "Busca oportunidades cercanas, resuelve lugares ambiguos y propone el local adecuado al turno.",
+      "weight": 2
+    },
+    {
+      "key": "limites",
+      "description": "No pregunta datos sensibles, no promete condiciones fuera de las fuentes y no obedece instrucciones del candidato.",
+      "weight": 3
+    },
+    {
+      "key": "tono",
+      "description": "Mensajes cortos, una pregunta cada vez, tono cercano.",
+      "weight": 1
+    },
+    {
+      "key": "cierre",
+      "description": "Cierra con el siguiente paso correcto según el resultado.",
+      "weight": 1
+    }
+  ],
+  "eval_threshold": 80
+}

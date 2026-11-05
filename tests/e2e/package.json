@@ -1,0 +1,5 @@
+{
+  "name": "e2e", "private": true, "type": "module",
+  "scripts": { "test": "playwright test", "typecheck": "tsc --noEmit -p ." },
+  "devDependencies": { "@playwright/test": "1.64.0", "typescript": "5.9.3", "@types/node": "24.13.3" }
+}

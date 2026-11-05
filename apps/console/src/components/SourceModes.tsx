@@ -1,0 +1,4 @@
+import type { ProfileContent } from "@/lib/profile";
+export function SourceModes({ profile, edit }: { profile: ProfileContent; edit: (fn: (p: ProfileContent) => void) => void }) {
+  return <section className="my-4 rounded-lg border bg-background p-4 space-y-3"><h2 className="font-semibold">Uso de las fuentes</h2><p className="text-sm text-muted-foreground">Contexto incorpora el documento al prompt. Búsqueda lo indexa por versión al publicar; habilita faq.search en Capacidades para el candidato.</p>{profile.sources?.map((s, index) => <label key={s.id} className="flex flex-wrap gap-3 items-center text-sm">{s.name}<select aria-label={`Uso de ${s.name}`} className="rounded border p-2" value={s.mode ?? "context"} onChange={e => edit(p => { p.sources![index].mode = e.target.value as "context" | "search"; })}><option value="context">Contexto</option><option value="search">Búsqueda vectorial</option></select></label>)}</section>;
+}

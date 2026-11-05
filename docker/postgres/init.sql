@@ -1,0 +1,6 @@
+CREATE ROLE screening LOGIN PASSWORD 'screening' NOSUPERUSER NOBYPASSRLS CREATEDB;
+CREATE DATABASE screening OWNER screening;
+\connect screening
+CREATE EXTENSION IF NOT EXISTS vector;
+\connect template1
+CREATE EXTENSION IF NOT EXISTS vector;

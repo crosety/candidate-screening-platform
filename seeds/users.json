@@ -1,0 +1,36 @@
+[
+  {
+    "email": "fde@orbio.local",
+    "full_name": "Equipo de configuración",
+    "memberships": [
+      {
+        "tenant": "grupo_sazon",
+        "role": "fde"
+      },
+      {
+        "tenant": "logistica",
+        "role": "fde"
+      }
+    ]
+  },
+  {
+    "email": "fde2@orbio.local",
+    "full_name": "Soporte de configuración",
+    "memberships": [
+      {
+        "tenant": "grupo_sazon",
+        "role": "fde"
+      }
+    ]
+  },
+  {
+    "email": "reclutadora@orbio.local",
+    "full_name": "Equipo de selección",
+    "memberships": [
+      {
+        "tenant": "grupo_sazon",
+        "role": "recruiter"
+      }
+    ]
+  }
+]

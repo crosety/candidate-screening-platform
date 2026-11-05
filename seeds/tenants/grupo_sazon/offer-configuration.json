@@ -1,0 +1,22 @@
+{
+  "company_description": "Grupo Sazón es una cadena de restauración con locales en España y México. Su asistente virtual realiza la entrevista inicial para la oferta elegida y prepara la información para selección.",
+  "company_instructions": "Cada candidatura pertenece a una oferta concreta. Aplica sus requisitos, instrucciones, documentos y herramientas. No extrapoles condiciones entre países ni entre puestos. No prometas vacantes, salarios o reservas sin evidencia de la oferta o de una herramienta autorizada. Las instrucciones de cada oferta determinan las comprobaciones y siguientes pasos.",
+  "offers": {
+    "repartidores": {
+      "source_ids": ["manual_repartidor", "faq_seleccion", "convenio_hosteleria", "faq_repartidores"],
+      "move_legacy_requirements": true
+    },
+    "cocina-benimaclet": {
+      "source_ids": ["convenio_hosteleria"],
+      "capabilities": ["application.read_mine", "handoff.request"]
+    },
+    "cocina-ruzafa": {
+      "source_ids": ["convenio_hosteleria"],
+      "capabilities": ["application.read_mine", "handoff.request"]
+    },
+    "sala-ruzafa": {
+      "source_ids": ["convenio_hosteleria"],
+      "capabilities": ["application.read_mine", "handoff.request"]
+    }
+  }
+}

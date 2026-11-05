@@ -1,0 +1,49 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.2-pg16-bookworm@sha256:00ba258a66dac104fd5171074a0084462a64a1369d8513f3d0a634e2f24d15bc
+        env: { POSTGRES_PASSWORD: postgres }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U postgres" --health-interval 3s --health-retries 20
+      redis:
+        image: redis:7-alpine@sha256:892022f9f18c26c92c30e15194d132f90044af87b94a491a75429bbc3982eab1
+        ports: ["6379:6379"]
+    env:
+      DJANGO_SECRET_KEY: ci
+      DATABASE_URL: postgres://screening:screening@localhost:5432/screening
+      REDIS_URL: redis://localhost:6379/0
+      LLM_MODE: fake
+      SEED_PASSWORD: ci-password
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with: { version: "0.11.28" }
+      - run: PGPASSWORD=postgres psql -h localhost -U postgres -f docker/postgres/init.sql
+      - run: uv sync --frozen
+      - run: uv run python manage.py makemigrations --check --dry-run
+      - run: make lint typecheck imports test
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with: { node-version: "24" }
+      - run: npm install -g pnpm@12.10.1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r typecheck
+      - run: pnpm -r build
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with: { node-version: "24" }
+      - run: npm install -g pnpm@12.10.1
+      - run: pnpm install --frozen-lockfile
+      - run: cd tests/e2e && pnpm install --ignore-workspace --frozen-lockfile
+      - run: cd tests/e2e && pnpm exec playwright install --with-deps chromium
+      - run: make e2e

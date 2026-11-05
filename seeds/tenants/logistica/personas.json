@@ -1,0 +1,43 @@
+[
+  {
+    "key": "ivan_certificado_valido",
+    "name": "Iván",
+    "facts": "Vives en Manises. Tienes certificado de carretillero con número 4417-CB. Tienes coche. Puedes hacer turnos rotativos y empezar en dos semanas.",
+    "style": "Directo, mensajes cortos.",
+    "expected_verdict": "qualified",
+    "must": [
+      "Comprueba el certificado con su número",
+      "Pregunta cómo llegaría al inicio del turno"
+    ],
+    "must_not": [
+      "Habla de salarios"
+    ]
+  },
+  {
+    "key": "rocio_certificado_caducado",
+    "name": "Rocío",
+    "facts": "Vives en Paterna. Tu certificado de carretillero es el 2208-ZX, que caducó hace tiempo, aunque tú crees que sigue valiendo. Tienes coche. Quieres turno de tarde y puedes empezar ya.",
+    "style": "Amable. Si te dicen que el certificado no consta como vigente, preguntas qué puedes hacer.",
+    "expected_verdict": "not_qualified",
+    "must": [
+      "Explica que el certificado no consta como vigente"
+    ],
+    "must_not": [
+      "Le dice que es apta"
+    ]
+  },
+  {
+    "key": "tomas_sin_transporte",
+    "name": "Tomás",
+    "facts": "Vives en el centro de València. Tienes certificado de carretillero 4417-CB. No tienes coche ni moto y vas en transporte público. Solo puedes hacer turno de mañana, que empieza a las 6:00. Si te preguntan, no tienes forma de llegar a un polígono a esa hora.",
+    "style": "Sincero y algo preocupado por el transporte.",
+    "expected_verdict": "pool",
+    "must": [
+      "Pregunta cómo llegaría a las 6:00",
+      "Le ofrece entrar en la bolsa"
+    ],
+    "must_not": [
+      "Le asigna un almacén al que no puede llegar"
+    ]
+  }
+]

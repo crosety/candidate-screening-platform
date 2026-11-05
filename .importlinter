@@ -1,0 +1,100 @@
+[importlinter]
+root_packages =
+    screening
+    web
+    adapters
+    connectors
+    worker
+include_external_packages = True
+
+[importlinter:contract:domain-pure]
+name = El dominio no importa nada de fuera
+type = forbidden
+source_modules =
+    screening.domain
+forbidden_modules =
+    screening.application
+    screening.platform
+    web
+    adapters
+    connectors
+    worker
+    django
+    channels
+    ninja
+    langchain
+    langchain_core
+    langchain_anthropic
+    langchain_aws
+    langchain_openai
+    openai
+    asgiref
+    numpy
+    langgraph
+    anthropic
+    boto3
+    botocore
+    mcp
+    httpx
+    psycopg
+    redis
+
+[importlinter:contract:application-no-infra]
+name = La aplicación no importa adaptadores ni frameworks
+type = forbidden
+source_modules =
+    screening.application
+forbidden_modules =
+    screening.platform
+    web
+    adapters
+    connectors
+    worker
+    django
+    channels
+    ninja
+    langchain
+    langchain_core
+    langchain_anthropic
+    langchain_aws
+    langchain_openai
+    openai
+    asgiref
+    numpy
+    langgraph
+    anthropic
+    boto3
+    botocore
+    mcp
+    httpx
+    psycopg
+    redis
+
+[importlinter:contract:connectors-no-web]
+name = Los conectores no importan Django, el agente ni los adaptadores
+type = forbidden
+source_modules =
+    connectors
+forbidden_modules =
+    screening.platform
+    web
+    worker
+    adapters
+    django
+    langchain
+    langchain_core
+    langchain_anthropic
+    langchain_aws
+    langchain_openai
+    openai
+    asgiref
+    numpy
+    langgraph
+
+[importlinter:contract:adapters-no-worker]
+name = Los adaptadores no dependen del worker
+type = forbidden
+source_modules =
+    adapters
+forbidden_modules =
+    worker

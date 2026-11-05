@@ -1,0 +1,12 @@
+[
+  {
+    "slug": "grupo_sazon",
+    "name": "Grupo Sazón",
+    "client_approval_required": true
+  },
+  {
+    "slug": "logistica",
+    "name": "Logística",
+    "client_approval_required": false
+  }
+]

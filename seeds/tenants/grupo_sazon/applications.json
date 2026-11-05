@@ -1,0 +1,30 @@
+[
+  {
+    "external_id": "SZN-1001",
+    "candidate_name": "Lucía Martín",
+    "phone": "+34000001001",
+    "city": "València",
+    "job_ref": "repartidores"
+  },
+  {
+    "external_id": "SZN-1002",
+    "candidate_name": "Andrés Gil",
+    "phone": "+34000001002",
+    "city": "València",
+    "job_ref": "repartidores"
+  },
+  {
+    "external_id": "SZN-1003",
+    "candidate_name": "Javi Ortega",
+    "phone": "+34000001003",
+    "city": "Castellón",
+    "job_ref": "repartidores"
+  },
+  {
+    "external_id": "SZN-1004",
+    "candidate_name": "Mariana López",
+    "phone": "+34000001004",
+    "city": "València",
+    "job_ref": "repartidores"
+  }
+]
